@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-organizations',
-  imports: [],
+  standalone: true,
   templateUrl: './organizations.html',
-  styleUrl: './organizations.scss',
+  styleUrls: ['./organizations.scss']
 })
-export class Organizations {
+export class OrganizationsComponent { }
 
-}

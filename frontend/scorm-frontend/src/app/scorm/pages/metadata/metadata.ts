@@ -1,11 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-metadata',
-  imports: [],
+  standalone: true,
   templateUrl: './metadata.html',
-  styleUrl: './metadata.scss',
+  styleUrls: ['./metadata.scss']
 })
-export class Metadata {
-
-}
+export class MetadataComponent { }

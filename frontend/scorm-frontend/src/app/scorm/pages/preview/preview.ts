@@ -1,11 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-preview',
-  imports: [],
+  standalone: true,
   templateUrl: './preview.html',
-  styleUrl: './preview.scss',
+  styleUrls: ['./preview.scss']
 })
-export class Preview {
-
-}
+export class PreviewComponent { }

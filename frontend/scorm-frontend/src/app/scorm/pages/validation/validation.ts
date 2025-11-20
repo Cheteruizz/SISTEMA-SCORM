@@ -1,11 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-validation',
-  imports: [],
+  standalone: true,
   templateUrl: './validation.html',
-  styleUrl: './validation.scss',
+  styleUrls: ['./validation.scss']
 })
-export class Validation {
-
-}
+export class ValidationComponent { }
