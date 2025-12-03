@@ -1,2 +1,50 @@
-<h2>SCORM – Módulo principal funcionando</h2>
-<p>Bienvenido al generador de paquetes SCORM.</p>
+<img src="logoSCORM.png" alt="Logotipo de la empresa" class="logo-img">
+<div class="contenedor-principal">
+
+  @if (vistaActual === 'menu') {
+    <div class="caja-menu">
+        <h2>Sistema Administrador SCORM</h2>
+        <p>Crea, gestiona y exporta paquetes SCORM 1.2 y 2004 de forma sencilla y profesional</p>
+      
+      <div class="botones-menu">
+        <button (click)="cambiarVista('login')">Iniciar sesión</button>
+        <button (click)="cambiarVista('registro')">Registrarse</button>
+      </div>
+    </div>
+  }
+
+
+  @if (vistaActual === 'login') {
+    <div class="caja-login">
+      <h2>Inicia sesión en tu cuenta</h2>
+      <p>Accede al sistema administrador SCORM para gestionar tus paquetes</p>
+      <input type="text" placeholder="Usuario">
+      <input type="password" placeholder="Contraseña">
+      
+      <input type="checkbox">
+      <label for="recordarPassword">Recordarme</label>
+      <a href="poner aqui donde la contraseña olvidada">¿Olvidaste tu contraseña?</a>
+      <button>Iniciar sesión</button>
+
+      <hr>
+      <button (click)="cambiarVista('menu')">Volver</button>
+    </div>
+  }
+
+
+  @if (vistaActual === 'registro') {
+    <div class="caja-registro">
+      <h2>Crear una cuenta nueva</h2>
+      <p>Regístrate para gestionar tus paquetes SCORM de forma sencilla y profesional.</p>
+      <input type="text" placeholder="Nombre completo">
+      <input type="email" placeholder="email@ejemplo.com">
+      <input type="password" placeholder="Contraseña">
+      <input type="password" placeholder="Repetir contraseña">
+      <button>Crear cuenta</button>
+
+      <hr>
+      <button (click)="cambiarVista('menu')">Volver</button>
+    </div>
+  }
+
+</div>

@@ -1,1 +1,123 @@
 /* You can add global styles to this file, and also import other style files */
+/* =========================================
+   VARIABLES (Tus colores maestros)
+   ========================================= */
+:root {
+  /* Azul oscuro del botón y bordes */
+  --color-principal: #0b2e4e; 
+  /* Verde menta del inicio del gradiente */
+  --verde-claro: #a8dec9;    
+  /* Verde intenso del check */
+  --verde-check: #00d348;    
+}
+
+/* =========================================
+   FONDO GENERAL (Gradiente)
+   ========================================= */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  /* El gradiente de izquierda (verde) a derecha (blanco) */
+  background: linear-gradient(135deg, var(--verde-claro) 27%, #ffffff 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Para que el fondo no se mueva al hacer scroll */
+  
+  /* Centrar todo el contenido vertical y horizontalmente por defecto */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: var(--color-principal);
+}
+
+/* =========================================
+   INPUTS (Cajas de texto redondeadas)
+   ========================================= */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  display: block;
+  width: 100%;
+  max-width: 350px; /* Ancho máximo para que se vea elegante */
+  margin: 15px auto; /* Centrado y separado */
+  padding: 12px 20px;
+  
+  /* ESTILO VISUAL */
+  background: white;
+  border: 2px solid var(--color-principal); /* Borde azul grueso */
+  border-radius: 50px; /* Borde completamente redondo (tipo píldora) */
+  
+  /* TEXTO INTERNO */
+  font-size: 1.1rem;
+  color: var(--color-principal);
+  text-align: center; /* Texto centrado como en la imagen */
+  outline: none; /* Quitar borde azul de Chrome al hacer clic */
+}
+
+/* Efecto al hacer clic en el input */
+input:focus {
+  box-shadow: 0 0 8px rgba(11, 46, 78, 0.3);
+}
+
+/* =========================================
+   BOTONES (Azul oscuro y redondos)
+   ========================================= */
+button {
+  background-color: var(--color-principal);
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  font-size: 1.2rem;
+  border-radius: 50px; /* Redondeado total */
+  cursor: pointer;
+  margin-top: 20px;
+  transition: transform 0.1s;
+  display: block;
+  margin: 20px auto;
+}
+
+button:active {
+  transform: scale(0.98); /* Pequeño efecto de pulsación */
+}
+
+/* =========================================
+   CHECKBOX (Casilla verde)
+   ========================================= */
+input[type="checkbox"] {
+  accent-color: var(--verde-check); /* Esto pinta la casilla de verde */
+  transform: scale(1.3); /* Un poco más grande */
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* =========================================
+   TEXTOS Y ENLACES
+   ========================================= */
+h1, h2, h3 {
+  color: var(--color-principal);
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+p {
+  text-align: center;
+  color: #555; /* Un gris suave para subtítulos */
+  font-size: 0.95rem;
+  margin-bottom: 30px;
+}
+
+a {
+  color: #3b82f6; /* Azul claro para enlaces */
+  text-decoration: none;
+}
+
+img {
+    height: 255px;
+    width: 255px;
+    display: block;
+    margin: auto;
+}

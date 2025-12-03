@@ -1,17 +1,25 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-
-# Compiled output
+# ---------------------------------------------
+# ARCHIVOS COMPILADOS (Lo que genera Angular)
+# ---------------------------------------------
 /dist
 /tmp
 /out-tsc
 /bazel-out
 
-# Node
+# ---------------------------------------------
+# DEPENDENCIAS (Lo más pesado e importante)
+# ---------------------------------------------
 /node_modules
-npm-debug.log
-yarn-error.log
 
-# IDEs and editors
+# ---------------------------------------------
+# CACHÉ DE ANGULAR (Versiones modernas)
+# ---------------------------------------------
+/.angular/cache
+.angular/
+
+# ---------------------------------------------
+# IDEs Y EDITORES (Configuraciones de tu PC)
+# ---------------------------------------------
 .idea/
 .project
 .classpath
@@ -20,24 +28,23 @@ yarn-error.log
 .settings/
 *.sublime-workspace
 
-# Visual Studio Code
+# Visual Studio Code (Opcional: a veces se comparten las settings)
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-.history/*
+.history/
 
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-__screenshots__/
-
-# System files
+# ---------------------------------------------
+# ARCHIVOS DE SISTEMA OPERATIVO
+# ---------------------------------------------
 .DS_Store
 Thumbs.db
+
+# ---------------------------------------------
+# LOGS DE ERRORES
+# ---------------------------------------------
+npm-debug.log
+yarn-error.log
+test-report.xml
