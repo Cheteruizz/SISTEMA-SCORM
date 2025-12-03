@@ -1,12 +1,17 @@
+// src/routes/proyecto.routes.js
 const express = require('express');
 const router = express.Router();
-const ProyectoController = require('../controllers/proyecto.controller');
+const proyectoController = require('../controllers/proyecto.controller');
 
-router.get('/', ProyectoController.getAllProyectos);
-router.get('/:id', ProyectoController.getProyectoById);
-router.post('/', ProyectoController.createProyecto);
-router.put('/:id', ProyectoController.updateProyecto);
-router.delete('/:id', ProyectoController.deleteProyecto);
+// Ruta de prueba opcional
+router.get('/ping', (req, res) => {
+  res.json({ mensaje: 'Rutas de proyectos funcionando correctamente' });
+});
+
+// GET /api/proyectos  → lista proyectos
+router.get('/', proyectoController.listarProyectos);
+
+// POST /api/proyectos  → crea proyecto
+router.post('/', proyectoController.crearProyecto);
 
 module.exports = router;
-

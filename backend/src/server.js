@@ -1,23 +1,27 @@
+require('dotenv').config();
 const express = require('express');
-const app = express();
-const port = 3000;
+const cors = require('cors');
 
-// Middleware
-app.use(express.json());
-
-// Rutas
 const usuarioRoutes = require('./routes/usuario.routes');
 const proyectoRoutes = require('./routes/proyecto.routes');
 
-app.use('/usuarios', usuarioRoutes);
-app.use('/proyectos', proyectoRoutes);
+const app = express();
 
-// Prueba raíz
+// Middlewares
+app.use(cors());
+app.use(express.json());
+
+// Rutas principales
+app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/proyectos', proyectoRoutes);
+
+// Ruta base
 app.get('/', (req, res) => {
-    res.send('Backend SCORM funcionando correctamente');
+    res.send("Backend SCORM funcionando correctamente");
 });
 
-// Puerto
-app.listen(port, () => {
-    console.log(`Servidor escuchando en http://localhost:${port}`);
+// Iniciar servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

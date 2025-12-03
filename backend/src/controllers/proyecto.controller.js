@@ -1,67 +1,49 @@
+// src/controllers/proyecto.controller.js
 const Proyecto = require('../models/proyecto.model');
 
-exports.getAllProyectos = async (req, res) => {
-    try {
-        const proyectos = await Proyecto.obtenerTodos();
-        res.json(proyectos);
-    } catch (err) {
-        console.error("Error obteniendo proyectos:", err);
-        res.status(500).json({ error: "Error obteniendo proyectos" });
-    }
+// GET /api/proyectos  → lista todos los proyectos
+const listarProyectos = async (req, res) => {
+  try {
+    const proyectos = await Proyecto.obtenerTodos();
+    return res.json(proyectos);
+  } catch (err) {
+    console.error('Error al obtener proyectos:', err);
+    return res.status(500).json({ mensaje: 'Error al obtener proyectos' });
+  }
 };
 
-exports.getProyectoById = async (req, res) => {
-    try {
-        const proyecto = await Proyecto.obtenerPorId(req.params.id);
+// POST /api/proyectos  → crea un proyecto nuevo
+const crearProyecto = async (req, res) => {
+  try {
+    const { id_usuario, titulo, descripcion, version_scorm, estado } = req.body;
 
-        if (!proyecto) {
-            return res.status(404).json({ error: "Proyecto no encontrado" });
-        }
-
-        res.json(proyecto);
-    } catch (err) {
-        console.error("Error obteniendo proyecto:", err);
-        res.status(500).json({ error: "Error obteniendo proyecto" });
+    // Validación mínima
+    if (!id_usuario || !titulo || !version_scorm || !estado) {
+      return res.status(400).json({
+        mensaje:
+          'id_usuario, titulo, version_scorm y estado son obligatorios',
+      });
     }
+
+    const id_proyecto = await Proyecto.crear({
+      id_usuario,
+      titulo,
+      descripcion: descripcion || null,
+      version_scorm,
+      estado,
+    });
+
+    return res.status(201).json({
+      mensaje: 'Proyecto creado correctamente',
+      id_proyecto,
+    });
+  } catch (err) {
+    console.error('Error al crear proyecto:', err);
+    return res.status(500).json({ mensaje: 'Error al crear proyecto' });
+  }
 };
 
-exports.createProyecto = async (req, res) => {
-    try {
-        const { id_usuario, nombre_proyecto, version } = req.body;
-
-        if (!id_usuario || !nombre_proyecto || !version) {
-            return res.status(400).json({ error: "Faltan datos obligatorios" });
-        }
-
-        const nuevoId = await Proyecto.crearProyecto({ id_usuario, nombre_proyecto, version });
-
-        res.json({ mensaje: "Proyecto creado", id: nuevoId });
-    } catch (err) {
-        console.error("Error creando proyecto:", err);
-        res.status(500).json({ error: "Error creando proyecto" });
-    }
-};
-
-exports.updateProyecto = async (req, res) => {
-    try {
-        const { nombre_proyecto, version } = req.body;
-
-        await Proyecto.actualizarProyecto(req.params.id, { nombre_proyecto, version });
-
-        res.json({ mensaje: "Proyecto actualizado" });
-    } catch (err) {
-        console.error("Error actualizando proyecto:", err);
-        res.status(500).json({ error: "Error actualizando proyecto" });
-    }
-};
-
-exports.deleteProyecto = async (req, res) => {
-    try {
-        await Proyecto.eliminarProyecto(req.params.id);
-
-        res.json({ mensaje: "Proyecto eliminado" });
-    } catch (err) {
-        console.error("Error eliminando proyecto:", err);
-        res.status(500).json({ error: "Error eliminando proyecto" });
-    }
+module.exports = {
+  listarProyectos,
+  crearProyecto,
 };
