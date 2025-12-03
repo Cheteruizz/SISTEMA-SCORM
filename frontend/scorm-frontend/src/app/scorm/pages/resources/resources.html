@@ -1,1 +1,161 @@
-<p>resources works!</p>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Previa - Estructura del Curso</title>
+    <link rel="stylesheet" href="">
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <button id="btnBack" class="back-btn" onclick="goBack()">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Volver</span>
+        </button>
+
+        <div id="viewUpload" class="fade-in">
+            <header class="header-section">
+                <div class="icon-container">
+                    <i class="fa-solid fa-graduation-cap overlay-icon"></i>
+                    <i class="fa-solid fa-laptop base-icon"></i>
+                </div>
+                
+                <h1 class="title">Recursos del Curso</h1>
+                <p class="subtitle">
+                    Sube aquí los archivos multimedia y materiales educativos que usarán tus lecciones.
+                    Puedes añadir tantos recursos como desees.
+                </p>
+            </header>
+
+            <form class="resource-form" onsubmit="event.preventDefault(); goToPreview();">
+                <h2 class="section-label">Archivo:</h2>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Nombre del Archivo:</label>
+                        <input type="text" class="input-box">
+                    </div>
+
+                    <div class="input-group">
+                        <label>ID del Archivo:</label>
+                        <input type="text" class="input-box">
+                    </div>
+                </div>
+
+                <div class="form-row align-bottom">
+                    <div class="input-group">
+                        <label>Tipo de Archivo:</label>
+                        <input type="text" class="input-box">
+                    </div>
+                    <div class="helper-text">
+                        Este sistema permite adjuntar cualquier tipo de archivo: PDF, vídeo, imágenes, documentos, ZIP, SCORM y más.
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="button" onclick="alert('Limpia formulario')" class="btn">
+                        Eliminar Archivo
+                    </button>
+                    <button type="button" onclick="alert('Sube archivo')" class="btn">
+                        SUBIR ARCHIVO
+                    </button>
+                    <button type="button" onclick="goToPreview()" class="btn">
+                        Vista previa <i class="fa-solid fa-arrow-right-long gold-arrow"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="viewPreview" class="fade-in hidden">
+            <header class="header-section">
+                <div class="icon-container">
+                    <i class="fa-solid fa-graduation-cap overlay-icon"></i>
+                    <i class="fa-solid fa-laptop base-icon"></i>
+                </div>
+                
+                <h1 class="title">Vista previa del Paquete SCORM</h1>
+                <p class="subtitle">
+                    Revisa toda la información de tu curso antes de generar el paquete SCORM. Puedes modificar cualquier sección.
+                </p>
+                
+                <h2 class="section-title-blue">Estructura del Curso</h2>
+            </header>
+
+            <div class="structure-grid">
+                
+                <div class="structure-col">
+                    <div class="col-title">Módulo:introducción</div>
+                    <div class="info-item">ID:</div>
+                    <div class="info-item">Duración estimada:</div>
+                    
+                    <p class="note-text">
+                        La duración total del curso será igual a la suma de de la duración de todos los módulos.
+                    </p>
+                </div>
+
+                <div class="structure-col">
+                    <div class="col-title">Lecciones del módulo:</div>
+                    <div class="col-title">Lección 1 – Bienvenida</div>
+                    
+                    <div class="info-item">ID: lec_01</div>
+                    <div class="info-item">Tipo: lectura</div>
+                    <div class="info-item">Recursos:</div>
+                    <div class="resource-list">
+                        <div class="resource-file">PDF_Bienvenida.pdf</div>
+                        <div class="resource-file">video_intro.mp4</div>
+                    </div>
+                </div>
+
+                <div class="structure-col">
+                    <div style="height: 23px;"></div> <div class="col-title">Lección 2 – Conceptos básicos</div>
+                    
+                    <div class="info-item">ID: lec_02</div>
+                    <div class="info-item">Tipo: actividad</div>
+                    <div class="info-item">Recursos:</div>
+                    <div class="resource-list">
+                        <div class="resource-file">actividad1.zip</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="action-buttons">
+                <button type="button" onclick="goBack()" class="btn">
+                    Editar
+                </button>
+
+                <button type="button" onclick="alert('¡Proceso Finalizado!')" class="btn">
+                    Finalizar
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- LÓGICA JAVASCRIPT ---
+
+        const viewUpload = document.getElementById('viewUpload');
+        const viewPreview = document.getElementById('viewPreview');
+
+        // Función para ir a la vista previa (Estructura)
+        function goToPreview() {
+            viewUpload.classList.add('hidden');
+            viewPreview.classList.remove('hidden');
+        }
+
+        // Función para volver (Editar o botón Volver)
+        function goBack() {
+            // Si estamos en la vista previa, volvemos al formulario
+            if (!viewPreview.classList.contains('hidden')) {
+                viewPreview.classList.add('hidden');
+                viewUpload.classList.remove('hidden');
+            } else {
+                console.log("Ya estás en el inicio o saliendo del componente");
+            }
+        }
+    </script>
+</body>
+</html>

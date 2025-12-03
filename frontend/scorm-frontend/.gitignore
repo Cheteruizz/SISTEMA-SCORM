@@ -1,50 +1,66 @@
-# ---------------------------------------------
-# ARCHIVOS COMPILADOS (Lo que genera Angular)
-# ---------------------------------------------
+# ------------------------------------------------
+# Dependencias
+# ------------------------------------------------
+/node_modules
+/npm-debug.log
+yarn-error.log
+pnpm-debug.log*
+
+# ------------------------------------------------
+# Compilación y Salida (Build)
+# ------------------------------------------------
+# Carpeta donde se genera la app compilada
 /dist
 /tmp
 /out-tsc
 /bazel-out
 
-# ---------------------------------------------
-# DEPENDENCIAS (Lo más pesado e importante)
-# ---------------------------------------------
-/node_modules
-
-# ---------------------------------------------
-# CACHÉ DE ANGULAR (Versiones modernas)
-# ---------------------------------------------
-/.angular/cache
+# ------------------------------------------------
+# Angular - Caché y Configuración Local
+# ------------------------------------------------
+# Carpeta de cache de Angular (Importante en v13+)
 .angular/
 
-# ---------------------------------------------
-# IDEs Y EDITORES (Configuraciones de tu PC)
-# ---------------------------------------------
-.idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
+# Archivos de entorno generados (Opcional, descomentar si usas SSR)
+# /dist/server
 
-# Visual Studio Code (Opcional: a veces se comparten las settings)
-.vscode/*
-!.vscode/settings.json
+# ------------------------------------------------
+# IDEs y Editores
+# ------------------------------------------------
+# Visual Studio Code
+.vscode/
+!.vscode/extensions.json
 !.vscode/tasks.json
 !.vscode/launch.json
-!.vscode/extensions.json
-.history/
+# (Nota: Las líneas con '!' permiten subir configuraciones útiles para el equipo, 
+# pero ignoran configuraciones personales)
 
-# ---------------------------------------------
-# ARCHIVOS DE SISTEMA OPERATIVO
-# ---------------------------------------------
+# IntelliJ / WebStorm
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse
+.project
+.classpath
+.cproject
+.settings/
+
+# ------------------------------------------------
+# Sistema Operativo
+# ------------------------------------------------
 .DS_Store
 Thumbs.db
 
-# ---------------------------------------------
-# LOGS DE ERRORES
-# ---------------------------------------------
-npm-debug.log
-yarn-error.log
-test-report.xml
+# ------------------------------------------------
+# Tests y Cobertura
+# ------------------------------------------------
+/coverage
+
+# ------------------------------------------------
+# Varios
+# ------------------------------------------------
+.sass-cache/
+connect.lock
+*.log
