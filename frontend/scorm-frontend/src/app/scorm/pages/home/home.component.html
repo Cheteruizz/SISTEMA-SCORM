@@ -13,37 +13,47 @@
     </div>
   }
 
-
   @if (vistaActual === 'login') {
     <div class="caja-login">
       <h2>Inicia sesión en tu cuenta</h2>
       <p>Accede al sistema administrador SCORM para gestionar tus paquetes</p>
-      <input type="text" placeholder="Usuario">
-      <input type="password" placeholder="Contraseña">
       
-      <input type="checkbox">
-      <label for="recordarPassword">Recordarme</label>
-      <a href="poner aqui donde la contraseña olvidada">¿Olvidaste tu contraseña?</a>
-      <button>Iniciar sesión</button>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()">
+          
+          <input type="text" placeholder="Usuario" formControlName="usuario">
+          <input type="password" placeholder="Contraseña" formControlName="password">
+          
+          <div class="checkbox-container">
+             <input type="checkbox" id="recordar" formControlName="recordarme">
+             <label for="recordar">Recordarme</label>
+          </div>
+
+          <a href="#">¿Olvidaste tu contraseña?</a>
+          
+          <button type="submit">Iniciar sesión</button>
+      </form>
 
       <hr>
-      <button (click)="cambiarVista('menu')">Volver</button>
+      <button type="button" (click)="cambiarVista('menu')">Volver</button>
     </div>
   }
-
 
   @if (vistaActual === 'registro') {
     <div class="caja-registro">
       <h2>Crear una cuenta nueva</h2>
       <p>Regístrate para gestionar tus paquetes SCORM de forma sencilla y profesional.</p>
-      <input type="text" placeholder="Nombre completo">
-      <input type="email" placeholder="email@ejemplo.com">
-      <input type="password" placeholder="Contraseña">
-      <input type="password" placeholder="Repetir contraseña">
-      <button>Crear cuenta</button>
+      
+      <form [formGroup]="registroForm" (ngSubmit)="onSubmitRegistro()">
+          <input type="text" placeholder="Nombre completo" formControlName="nombre">
+          <input type="email" placeholder="email@ejemplo.com" formControlName="email">
+          <input type="password" placeholder="Contraseña" formControlName="password">
+          <input type="password" placeholder="Repetir contraseña" formControlName="repetirPassword">
+          
+          <button type="submit">Crear cuenta</button>
+      </form>
 
       <hr>
-      <button (click)="cambiarVista('menu')">Volver</button>
+      <button type="button" (click)="cambiarVista('menu')">Volver</button>
     </div>
   }
 
