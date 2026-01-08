@@ -1,0 +1,163 @@
+// Variables de colores basadas en tu imagen
+$color-fondo-inicio: #9beebd; // Verde agua claro
+$color-fondo-fin: #ffffff;    // Blanco
+$azul-oscuro: #0a2e52;        // Color de los botones y textos fuertes
+$borde-azul: #0a4b78;         // Borde de los inputs
+$color-texto-gris: #666;
+$dorado: #d4af37;             // Para la flecha
+
+.contenedor-recursos {
+  min-height: 100vh;
+  width: 100%;
+  // El degradado de fondo (verde agua a blanco hacia la derecha)
+  
+}
+
+// Botón Volver (Arriba Izquierda)
+.header-nav {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.btn-volver-atras {
+  background: none;
+  border: none;
+  color: $azul-oscuro;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  .flecha-azul {
+    font-size: 1.5rem;
+    margin-bottom: -5px;
+  }
+}
+
+.contenido-central {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  padding-top: 20px;
+}
+
+// Cabecera
+.icono-laptop img {
+  width: 120px; // Ajusta según tu imagen
+  margin-bottom: 10px;
+}
+
+.titulo-principal {
+  color: $azul-oscuro;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.descripcion {
+  color: $color-texto-gris;
+  font-size: 1.1rem;
+  max-width: 800px;
+  margin: 0 auto 30px auto;
+}
+
+// Formulario
+.formulario-recursos {
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.subtitulo-archivo {
+  color: $azul-oscuro;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+
+.grid-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr; // Dos columnas
+  gap: 20px 40px;
+  align-items: center;
+}
+
+.grupo-input {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  label {
+    color: $azul-oscuro;
+    font-size: 1.1rem;
+    white-space: nowrap; // Que no se rompa la línea del label
+    min-width: 150px;
+    text-align: right;
+  }
+
+  input.input-borde-azul {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid $borde-azul;
+    border-radius: 4px; // Bordes ligeramente redondeados como en la foto
+    font-size: 1rem;
+    background-color: white;
+    outline: none;
+    
+    &:focus {
+      box-shadow: 0 0 5px rgba($borde-azul, 0.5);
+    }
+  }
+}
+
+.texto-ayuda-container {
+  display: flex;
+  align-items: center;
+}
+
+.texto-ayuda {
+  font-size: 0.85rem;
+  color: $color-texto-gris;
+  line-height: 1.4;
+  margin: 0;
+}
+
+// Botonera Inferior
+.acciones-inferiores {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 50px;
+  flex-wrap: wrap;
+}
+
+.btn-accion {
+  background-color: $azul-oscuro;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 30px; // Forma de píldora
+  font-size: 1.2rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  min-width: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  &:hover {
+    background-color: lighten($azul-oscuro, 10%);
+    transform: scale(1.05);
+  }
+}
+
+.flecha-dorada {
+  color: #f1c40f; // Dorado brillante
+  font-size: 1.5rem;
+  font-weight: bold;
+  // Simular efecto metálico simple
+  text-shadow: 1px 1px 0px #b7950b; 
+}

@@ -1,6 +1,21 @@
-<h2>Layout SCORM</h2>
-<hr>
+<div class="header-nav">
+        <button class="btn-volver-atras" (click)="volver()">
+            <span class="flecha-azul">&#8617;</span> Volver
+        </button>
+</div>
+<img src="logoSCORM.png" alt="Logotipo de la empresa" class="logo-img">
 
+<h2>Panel Principal</h2>
+<p>Gestiona tus paquetes SCORM de forma sencilla y profesional.</p>
+
+<div class="navegacion-layout">
+    <button (click)="crearPaquete()">Crear nuevo paquete</button>
+    <p>Inicia un proyecto desde cero.</p>
+
+    <button (click)="historial()">Historial y Borradores</button>
+    <p>Gestiona y retoma tus paquetes creados o en desarrollo.</p>
+    <!--Falta meter el historial de paquetes y los borradores-->
+</div>
 <!-- aquí aparecerán las páginas -->
 <router-outlet></router-outlet>
 
