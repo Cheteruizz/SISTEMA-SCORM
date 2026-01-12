@@ -1,58 +1,63 @@
 <div class="contenedor-recursos">
+  <div class="header-nav">
+    <button class="btn-volver-atras" (click)="volver()">
+      <span class="flecha-azul">&#8592;</span> Volver
+    </button>
+  </div>
 
-    <div class="header-nav">
-        <button class="btn-volver-atras" (click)="volver()">
-            <span class="flecha-azul">&#8617;</span> Volver
-        </button>
+  <div class="contenido-central">
+    <div class="cabecera">
+      <img src="logoSCORM.png" alt="Logo SCORM" class="icono-principal">
+      <h1 class="titulo-principal">Recursos del Curso</h1>
+      <p class="descripcion">
+        Sube aqu&#237; los archivos multimedia y materiales educativos que usar&#225;n tus lecciones.
+        Puedes a&#241;adir tantos recursos como desees.
+      </p>
     </div>
 
-    <div class="contenido-central">
-        <!-- Información sobre como subir archivos -->
-        <div class="cabecera">
-            <h1 class="titulo-principal">Recursos del Curso</h1>
+    <form [formGroup]="recursosForm" class="formulario-recursos">
+      <h3 class="subtitulo-archivo">Archivo:</h3>
 
-            <p class="descripcion">
-                Sube aquí los archivos multimedia y materiales educativos que usarán tus lecciones.
-                Puedes añadir tantos recursos como desees.
-            </p>
+      <div class="grid-inputs">
+        <div class="grupo-input">
+          <label>Nombre del Archivo:</label>
+          <input type="text" formControlName="nombreArchivo" class="input-borde-azul">
         </div>
 
-        <form [formGroup]="recursosForm" class="formulario-recursos">
-            <!-- Campos de subida archivo -->
-            <h3 class="subtitulo-archivo">Archivo:</h3>
+        <div class="grupo-input">
+          <label>ID del Archivo:</label>
+          <input type="text" formControlName="idArchivo" class="input-borde-azul" placeholder="Se genera automatico" [disabled]="true">
+        </div>
 
-            <div class="grid-inputs">
-                <div class="grupo-input">
-                    <label>Nombre del Archivo:</label>
-                    <input type="text" formControlName="nombreArchivo" class="input-borde-azul">
-                </div>
+        <div class="grupo-input">
+          <label>ID Lecci&#243;n:</label>
+          <select formControlName="idLeccion" class="input-borde-azul">
+            <option value="">Selecciona una lecci&#243;n</option>
+            <option *ngFor="let lec of lecciones" [value]="lec.id_leccion">
+              {{ lec.label }}
+            </option>
+          </select>
+        </div>
 
-                <div class="grupo-input">
-                    <label>ID del Archivo:</label>
-                    <input type="text" formControlName="idArchivo" class="input-borde-azul">
-                </div>
+        <div class="grupo-input">
+          <label>Tipo de Archivo:</label>
+          <input type="file" formControlName="tipoArchivo" class="input-borde-azul"
+                 (change)="onFileSelected($event)"
+                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.mp4,.avi,.mov,.zip,.rar,.scorm,.html">
+        </div>
 
-                <div class="grupo-input">
-                    <label>Tipo de Archivo:</label>
-                    <input type="file" formControlName="tipoArchivo" class="input-borde-azul"
-                        (change)="onFileSelected($event)"
-                        accept=".pdf, .doc, .docx, .jpg, .jpeg, .png, .gif, .mp4, .avi, .zip, .rar, .scorm">
-                </div>
+        <div class="texto-ayuda-container">
+          <p class="texto-ayuda">
+            Este sistema permite adjuntar archivos PDF, video, imagenes, documentos y ZIP.
+          </p>
+        </div>
+      </div>
+    </form>
+  </div>
 
-                <div class="texto-ayuda-container">
-                    <p class="texto-ayuda">
-                        Este sistema permite adjuntar cualquier tipo de archivo: PDF, vídeo, imágenes, documentos, ZIP,
-                        SCORM y más.
-                    </p>
-                </div>
-            </div>
-
-        </form>
-    </div>
-    <!-- Botones de acción -->
-    <button class="btn-accion btn-preview" (click)="irAVistaPrevia()">
-        Vista previa <span class="flecha-dorada">➜</span>
-    </button>
+  <div class="acciones-inferiores">
+    <button class="btn-accion" (click)="eliminarArchivo()">Eliminar Archivo</button>
+    <button class="btn-accion" (click)="subirArchivo()">Subir Archivo</button>
+    <button class="btn-accion btn-preview" (click)="irAVistaPrevia()">Vista previa</button>
+  </div>
 </div>
-
-

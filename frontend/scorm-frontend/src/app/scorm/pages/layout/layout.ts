@@ -1,11 +1,10 @@
 import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [],
   templateUrl: './layout.html',
   styleUrls: ['./layout.scss'],
 })
@@ -21,6 +20,7 @@ export class LayoutComponent {
 
   historial(){
     //Va al historial de paquetes creados
+    this.router.navigate(['/history']);
   }
 
   volver(){

@@ -1,1 +1,76 @@
-<p>preview works!</p>
+<div class="preview-shell">
+  <button class="back-link" (click)="volver()">
+    &#8592; Volver
+  </button>
+
+  <img src="logoSCORM.png" alt="Logo SCORM" class="logo-img">
+
+  <h1>Vista previa del Paquete SCORM</h1>
+  <p>Revisa la informaci&#243;n antes de generar el paquete SCORM.</p>
+
+  <section class="preview-section">
+    <h2>Informaci&#243;n general</h2>
+    <div class="preview-grid">
+      <div>
+        <label>T&#237;tulo del curso:</label>
+        <div class="preview-box">{{ proyecto?.titulo || 'Sin titulo' }}</div>
+      </div>
+      <div>
+        <label>Versi&#243;n SCORM:</label>
+        <div class="preview-box">{{ versionLabel }}</div>
+      </div>
+      <div>
+        <label>Idioma:</label>
+        <div class="preview-box">{{ metadata?.idioma || 'es' }}</div>
+      </div>
+      <div class="full">
+        <label>Descripci&#243;n del curso:</label>
+        <div class="preview-box">{{ proyecto?.descripcion || 'Sin descripcion' }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="preview-section">
+    <h2>Informaci&#243;n de autoria</h2>
+    <div class="preview-grid">
+      <div>
+        <label>Autor principal:</label>
+        <div class="preview-box">{{ metadata?.autor_principal || '-' }}</div>
+      </div>
+      <div>
+        <label>Organizaci&#243;n:</label>
+        <div class="preview-box">{{ metadata?.organizacion || '-' }}</div>
+      </div>
+      <div class="full">
+        <label>Entidad publicadora:</label>
+        <div class="preview-box">{{ metadata?.entidad_publicadora || '-' }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="preview-section">
+    <h2>Estructura del curso</h2>
+    <div *ngIf="modulos.length === 0" class="empty-state">
+      No hay modulos creados.
+    </div>
+
+    <div class="modulo-card" *ngFor="let mod of modulos">
+      <h3>{{ mod.codigo }} - {{ mod.nombre }}</h3>
+      <div *ngIf="mod.lecciones.length === 0" class="empty-state">
+        No hay lecciones en este modulo.
+      </div>
+      <div class="leccion-row" *ngFor="let lec of mod.lecciones">
+        <div>
+          <strong>{{ lec.codigo }}</strong> - {{ lec.nombre }} ({{ lec.tipo }})
+        </div>
+        <div class="recursos-lista" *ngIf="lec.recursos.length">
+          Recursos: {{ lec.recursos.join(', ') }}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="acciones-finales">
+    <button class="btn-solid" (click)="generarScorm()">Generar SCORM</button>
+  </div>
+</div>

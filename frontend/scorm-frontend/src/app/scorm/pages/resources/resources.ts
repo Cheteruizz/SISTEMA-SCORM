@@ -1,169 +1,126 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ScormService } from '../../../services/scorm.service';
+import { ScormStateService } from '../../../services/scorm-state.service';
+
+interface LeccionOption {
+  id_leccion: number;
+  id_modulo: number;
+  label: string;
+}
 
 @Component({
   selector: 'app-resources',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './resources.html',
-  styleUrls: ['./resources.scss']
+  styleUrls: ['./resources.scss'],
 })
-export class ResourcesComponent {
-  
+export class ResourcesComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private scorm = inject(ScormService);
+  private state = inject(ScormStateService);
 
   recursosForm: FormGroup;
-
-  // Variables para manejar el archivo
   archivoSeleccionado: File | null = null;
-  nombreArchivoSeleccionado: string = '';
-
-  // 1. LISTA BLANCA (Tu configuración)
-  private extensionesPermitidas = [
-    'pdf', 
-    'jpg', 'jpeg', 'png', 'gif', 
-    'mp4', 'avi', 'mov', 
-    'doc', 'docx', 'txt',
-    'zip', 'rar', 
-    'scorm'
-  ];
-
-  // 2. DICCIONARIO DE MENSAJES (Ingeniería inversa de iLovePDF)
-  private iloveLang = {
-    InvalidExtension: 'Lo sentimos, este formato no está soportado',
-    EmptyFile: 'Tu archivo está vacío o dañado',
-    DamagedFile: 'Archivo dañado/corrupto', // Usado para bloquear accesos directos
-    FileSizeExceeded: 'El tamaño de tu documento supera el límite',
-    UploadError: 'Error de subida',
-    Success: '¡Subida completada!'
-  };
+  lecciones: LeccionOption[] = [];
+  moduloItemMap: Record<number, number> = {};
 
   constructor() {
     this.recursosForm = this.fb.group({
       nombreArchivo: ['', Validators.required],
-      idArchivo: ['', Validators.required], // Mantenemos tu campo ID
-      tipoArchivo: ['', Validators.required]
+      idArchivo: [''],
+      idLeccion: ['', Validators.required],
+      tipoArchivo: ['', Validators.required],
     });
   }
 
-  // --- LÓGICA DE VALIDACIÓN PROFESIONAL ---
+  ngOnInit() {
+    const projectId = this.state.getProjectId();
+    if (!projectId) {
+      alert('No hay proyecto activo.');
+      this.router.navigate(['/metadata']);
+      return;
+    }
 
-  /**
-   * Se ejecuta cuando el usuario selecciona un archivo
-   */
+    this.scorm.listarModulos(projectId).subscribe({
+      next: (modulos: any[]) => {
+        modulos.forEach((mod) => {
+          this.scorm.listarLecciones(mod.id_modulo).subscribe({
+            next: (lecciones: any[]) => {
+              lecciones.forEach((lec) => {
+                this.lecciones.push({
+                  id_leccion: lec.id_leccion,
+                  id_modulo: mod.id_modulo,
+                  label: `${lec.codigo_leccion || lec.id_leccion} - ${lec.nombre_leccion}`,
+                });
+              });
+            },
+          });
+        });
+      },
+    });
+
+    const orgId = this.state.getOrganizationId();
+    if (orgId) {
+      this.scorm.listarItems(orgId).subscribe({
+        next: (items: any[]) => {
+          items
+            .filter((item) => item.tipo_item === 'modulo')
+            .forEach((item) => {
+              this.moduloItemMap[item.id_modulo] = item.id_item;
+            });
+        },
+      });
+    }
+  }
+
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
-
-    // Si el usuario cancela la selección, no hacemos nada
     if (!file) return;
 
-    // --- ZONA DE DIAGNÓSTICO (MIRA LA CONSOLA F12) ---
-    // Esto te ayudará a ver si Windows te está pasando un acceso directo o el archivo real
-    const limiteMB = 50; 
+    const limiteMB = 100;
     const limiteBytes = limiteMB * 1024 * 1024;
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    const extensionesPermitidas = [
+      'pdf',
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'mp4',
+      'avi',
+      'mov',
+      'doc',
+      'docx',
+      'txt',
+      'zip',
+      'rar',
+      'scorm',
+      'html',
+    ];
 
-    console.log('--- DIAGNÓSTICO DE ARCHIVO ---');
-    console.log('Nombre:', file.name);
-    console.log('Tipo:', file.type);
-    console.log('Tamaño:', file.size, 'bytes');
-
-    // =========================================================
-    // 🛡️ BARRERAS DE SEGURIDAD (Lógica iLovePDF)
-    // =========================================================
-
-    // REGLA 1: ARCHIVOS VACÍOS (EmptyFile)
-    // Bloqueamos archivos de 0 bytes o casi vacíos (metadata residual)
-    if (file.size <= 10) {
-      this.mostrarError('🚫 ' + this.iloveLang.EmptyFile);
-      this.limpiarInput(event);
-      return;
-    }
-
-    // REGLA 2: DETECTOR DE ACCESOS DIRECTOS (DamagedFile)
-    // Si pesa menos de 2KB (2048 bytes) y NO es un archivo de texto (.txt)
-    // es casi seguro un acceso directo corrupto (.lnk) que el navegador leyó mal.
-    const esTexto = file.name.toLowerCase().endsWith('.txt') || file.type === 'text/plain';
-    
-    if (file.size < 2048 && !esTexto) {
-      // Usamos su mensaje de "DamagedFile" para dar feedback profesional
-      this.mostrarError('🚫 ' + this.iloveLang.DamagedFile + '\n\nParece un acceso directo (.lnk). Por favor, selecciona el archivo original.');
-      this.limpiarInput(event);
-      return;
-    }
-
-    // REGLA 3: EXTENSIONES DE SISTEMA PROHIBIDAS
-    if (file.name.toLowerCase().endsWith('.lnk') || file.name.toLowerCase().endsWith('.url')) {
-      this.mostrarError('🚫 No se permiten accesos directos.');
-      this.limpiarInput(event);
-      return;
-    }
-
-    // REGLA 4: LISTA BLANCA DE EXTENSIONES (InvalidExtension)
-    if (!this.validarExtension(file.name)) {
-      this.mostrarError('❌ ' + this.iloveLang.InvalidExtension + '\nSolo aceptamos: ' + this.extensionesPermitidas.join(', '));
-      this.limpiarInput(event);
-      return;
-    }
-
-    // REGLA 5: LÍMITE DE TAMAÑO (FileSizeExceeded)
     if (file.size > limiteBytes) {
-      this.mostrarError('⚠️ ' + this.iloveLang.FileSizeExceeded + ` (Máx ${limiteMB}MB)`);
-      this.limpiarInput(event);
+      alert('El archivo supera el limite de 100MB.');
+      event.target.value = '';
       return;
     }
 
-    // =========================================================
-    // ✅ ÉXITO: EL ARCHIVO ES SEGURO
-    // =========================================================
-    
-    this.archivoSeleccionado = file;
-    this.nombreArchivoSeleccionado = file.name;
+    if (!extensionesPermitidas.includes(ext)) {
+      alert('Formato no soportado.');
+      event.target.value = '';
+      return;
+    }
 
-    // Rellenamos el formulario automáticamente
+    this.archivoSeleccionado = file;
     this.recursosForm.patchValue({
       nombreArchivo: file.name,
-      // Como no sé de dónde sacas el ID, dejo esto vacío o genérico, o mantenlo como estaba si lo generas tú
-      idArchivo: 'ID-' + new Date().getTime(), 
-      tipoArchivo: this.obtenerEtiquetaTipo(file.name, file.type)
+      tipoArchivo: ext.toUpperCase(),
     });
   }
-
-  // --- FUNCIONES AUXILIARES ---
-
-  mostrarError(mensaje: string) {
-    alert(mensaje);
-  }
-
-  limpiarInput(event: any) {
-    event.target.value = ''; // Resetea el input HTML
-    this.archivoSeleccionado = null;
-    this.nombreArchivoSeleccionado = '';
-    this.recursosForm.reset();
-  }
-
-  validarExtension(nombreArchivo: string): boolean {
-    const extension = nombreArchivo.split('.').pop()?.toLowerCase() || '';
-    return this.extensionesPermitidas.includes(extension);
-  }
-
-  obtenerEtiquetaTipo(nombre: string, mimeType: string): string {
-    const ext = nombre.split('.').pop()?.toLowerCase();
-    
-    if (ext === 'pdf') return 'Documento PDF';
-    if (['jpg', 'jpeg', 'png', 'gif'].includes(ext!)) return 'Imagen';
-    if (['mp4', 'avi', 'mov'].includes(ext!)) return 'Vídeo';
-    if (['zip', 'rar'].includes(ext!)) return 'Archivo Comprimido (ZIP)';
-    if (ext === 'scorm') return 'Paquete SCORM';
-    if (['doc', 'docx'].includes(ext!)) return 'Documento Word';
-    if (ext === 'txt') return 'Documento de Texto';
-    
-    return mimeType || 'Archivo General';
-  }
-
-  // --- NAVEGACIÓN (Tus funciones originales) ---
 
   volver() {
     this.router.navigate(['/organizations']);
@@ -173,33 +130,70 @@ export class ResourcesComponent {
     this.router.navigate(['/preview']);
   }
 
-  // --- ACCIONES DE BOTONES ---
-
   subirArchivo() {
-    if (this.recursosForm.valid && this.archivoSeleccionado) {
-      
-      console.log('--- SUBIENDO ---');
-      console.log('Archivo:', this.archivoSeleccionado.name);
-      
-      // Simulación de éxito usando el mensaje oficial
-      alert('✅ ' + this.iloveLang.Success + '\nArchivo: ' + this.nombreArchivoSeleccionado);
-      
-    } else {
-      this.recursosForm.markAllAsTouched();
-      
-      if (!this.archivoSeleccionado) {
-        alert('Por favor, selecciona un archivo primero.');
-      } else {
-        alert('Por favor, rellena todos los campos obligatorios.');
-      }
+    if (!this.recursosForm.valid || !this.archivoSeleccionado) {
+      alert('Completa los campos y selecciona un archivo.');
+      return;
     }
+
+    const projectId = this.state.getProjectId();
+    const manifestId = this.state.getManifestId();
+    const orgId = this.state.getOrganizationId();
+    if (!projectId || !manifestId || !orgId) {
+      alert('No hay proyecto activo.');
+      return;
+    }
+
+    const idLeccion = Number(this.recursosForm.value.idLeccion);
+    const leccion = this.lecciones.find((lec) => lec.id_leccion === idLeccion);
+    const parentItemId = leccion ? this.moduloItemMap[leccion.id_modulo] : null;
+
+    this.scorm.subirArchivo(projectId, idLeccion, this.archivoSeleccionado).subscribe({
+      next: (archivo) => {
+        const recursoId = `RES_${Date.now()}`;
+        const itemId = `ITEM_${Date.now()}`;
+
+        this.scorm
+          .crearRecurso({
+            id_manifest: manifestId,
+            id_archivo: archivo.id_archivo,
+            identificador: recursoId,
+            href: archivo.nombre_fisico,
+            tipo_recurso: 'webcontent',
+            scorm_type: 'sco',
+          })
+          .subscribe({
+            next: (recurso) => {
+              this.scorm
+                .crearItem({
+                  id_organizacion: orgId,
+                  id_padre: parentItemId || null,
+                  identificador: itemId,
+                  titulo: this.recursosForm.value.nombreArchivo,
+                  tipo_item: 'sco',
+                  orden: 1,
+                  es_lanzable: 1,
+                  id_leccion: idLeccion,
+                  id_recurso: recurso.id_recurso,
+                })
+                .subscribe({
+                  next: () => {
+                    alert('Archivo subido correctamente.');
+                    this.recursosForm.reset();
+                    this.archivoSeleccionado = null;
+                  },
+                  error: () => alert('Error al crear item.'),
+                });
+            },
+            error: () => alert('Error al crear recurso.'),
+          });
+      },
+      error: () => alert('Error al subir archivo.'),
+    });
   }
 
   eliminarArchivo() {
-    // Limpieza total
     this.recursosForm.reset();
     this.archivoSeleccionado = null;
-    this.nombreArchivoSeleccionado = '';
-    console.log('Formulario y archivo limpiados');
   }
 }

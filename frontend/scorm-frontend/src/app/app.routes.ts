@@ -6,6 +6,7 @@ import { OrganizationsComponent } from './scorm/pages/organizations/organization
 import { PreviewComponent } from './scorm/pages/preview/preview';
 import { ResourcesComponent } from './scorm/pages/resources/resources';
 import { ValidationComponent } from './scorm/pages/validation/validation';
+import { HistoryComponent } from './scorm/pages/history/history';
 
 export const routes: Routes = [
   {
@@ -40,6 +41,10 @@ export const routes: Routes = [
   {
     path: 'validation',
     component: ValidationComponent
+  },
+  {
+    path: 'history',
+    component: HistoryComponent
   },
   {
     path: '',

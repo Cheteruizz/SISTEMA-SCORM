@@ -1,60 +1,56 @@
-<img src="logoSCORM.png" alt="Logotipo de la empresa" class="logo-img">
-<div class="contenedor-principal">
-
+<div class="home-shell">
   @if (vistaActual === 'menu') {
-    <div class="caja-menu">
-        <h2>Sistema Administrador SCORM</h2>
-        <p>Crea, gestiona y exporta paquetes SCORM 1.2 y 2004 de forma sencilla y profesional</p>
-      
-      <div class="botones-menu">
-        <button (click)="cambiarVista('login')">Iniciar sesión</button>
-        <button (click)="cambiarVista('registro')">Registrarse</button>
-      </div>
+    <img src="logoSCORM.png" alt="Logotipo de la empresa" class="logo-img logo-large">
+    <h1>Sistema Administrador SCORM</h1>
+    <p>Crea, gestiona y exporta paquetes SCORM 1.2 y 2004 de forma sencilla y profesional.</p>
+
+    <div class="menu-actions">
+      <button class="btn-outline" (click)="cambiarVista('login')">Iniciar sesi&#243;n</button>
+      <button class="btn-outline" (click)="cambiarVista('registro')">Registrarse</button>
     </div>
   }
 
   @if (vistaActual === 'login') {
-    <div class="caja-login">
-      <h2>Inicia sesión en tu cuenta</h2>
-      <p>Accede al sistema administrador SCORM para gestionar tus paquetes</p>
-      
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()">
-          
-          <input type="text" placeholder="Usuario" formControlName="usuario">
-          <input type="password" placeholder="Contraseña" formControlName="password">
-          
-          <div class="checkbox-container">
-             <input type="checkbox" id="recordar" formControlName="recordarme">
-             <label for="recordar">Recordarme</label>
-          </div>
+    <button type="button" class="back-link" (click)="cambiarVista('menu')">
+      &#8592; Volver
+    </button>
 
-          <a href="#">¿Olvidaste tu contraseña?</a>
-          
-          <button type="submit">Iniciar sesión</button>
-      </form>
+    <img src="logoSCORM.png" alt="Logotipo de la empresa" class="logo-img">
+    <h1>Inicia sesi&#243;n en tu cuenta</h1>
+    <p>Accede al sistema administrador SCORM para gestionar tus paquetes.</p>
 
-      <hr>
-      <button type="button" (click)="cambiarVista('menu')">Volver</button>
-    </div>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()" class="auth-form">
+      <input type="email" placeholder="tu@email.com" formControlName="email">
+      <input type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" formControlName="password">
+
+      <div class="login-row">
+        <label class="checkbox-label">
+          <input type="checkbox" id="recordar" formControlName="recordarme">
+          Recordarme
+        </label>
+        <a class="link" href="#">&#191;Olvidaste tu contrase&#241;a?</a>
+      </div>
+
+      <button type="submit" class="btn-solid">Iniciar sesi&#243;n</button>
+    </form>
   }
 
   @if (vistaActual === 'registro') {
-    <div class="caja-registro">
-      <h2>Crear una cuenta nueva</h2>
-      <p>Regístrate para gestionar tus paquetes SCORM de forma sencilla y profesional.</p>
-      
-      <form [formGroup]="registroForm" (ngSubmit)="onSubmitRegistro()">
-          <input type="text" placeholder="Nombre completo" formControlName="nombre">
-          <input type="email" placeholder="email@ejemplo.com" formControlName="email">
-          <input type="password" placeholder="Contraseña" formControlName="password">
-          <input type="password" placeholder="Repetir contraseña" formControlName="repetirPassword">
-          
-          <button type="submit">Crear cuenta</button>
-      </form>
+    <button type="button" class="back-link" (click)="cambiarVista('menu')">
+      &#8592; Volver
+    </button>
 
-      <hr>
-      <button type="button" (click)="cambiarVista('menu')">Volver</button>
-    </div>
+    <img src="logoSCORM.png" alt="Logotipo de la empresa" class="logo-img">
+    <h1>Crear una cuenta nueva</h1>
+    <p>Reg&#237;strate para gestionar tus paquetes SCORM de forma sencilla y profesional.</p>
+
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmitRegistro()" class="auth-form">
+      <input type="text" placeholder="Nombre completo" formControlName="nombre">
+      <input type="email" placeholder="email@ejemplo.com" formControlName="email">
+      <input type="password" placeholder="Contrase&#241;a" formControlName="password">
+      <input type="password" placeholder="Repetir contrase&#241;a" formControlName="repetirPassword">
+
+      <button type="submit" class="btn-solid">Crear cuenta</button>
+    </form>
   }
-
 </div>

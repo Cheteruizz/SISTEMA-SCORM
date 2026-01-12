@@ -1,1 +1,44 @@
-<p>validation works!</p>
+<div class="validation-shell">
+  <button class="back-link" (click)="volver()">
+    &#8592; Volver
+  </button>
+
+  <img src="logoSCORM.png" alt="Logo SCORM" class="logo-img">
+
+  <h1>Configuraci&#243;n del est&#225;ndar SCORM</h1>
+  <p>Selecciona la versi&#243;n del est&#225;ndar con la que se generar&#225; tu paquete educativo.</p>
+
+  <div class="scorm-grid">
+    <article class="scorm-card">
+      <h2>SCORM 1.2</h2>
+      <p>
+        Es la versi&#243;n m&#225;s ampliamente soportada por plataformas LMS como Moodle, Canvas,
+        Blackboard, Chamilo y Google Classroom.
+      </p>
+      <p>
+        Permite tracking b&#225;sico del progreso, puntuaciones, estado de completado,
+        tiempo y comunicaci&#243;n con el LMS de forma estable.
+      </p>
+      <p>
+        Es la opci&#243;n m&#225;s compatible y recomendada para la mayor&#237;a de proyectos educativos.
+      </p>
+      <button class="btn-solid" (click)="seleccionarVersion('1.2')">Elegir SCORM 1.2 y continuar</button>
+    </article>
+
+    <article class="scorm-card">
+      <h2>SCORM 2004</h2>
+      <p>
+        Incluye todas las funciones de SCORM 1.2 (tracking de progreso, puntuaciones,
+        estado, tiempo y comunicaci&#243;n LMS), y a&#241;ade mejoras avanzadas.
+      </p>
+      <p>
+        Permite secuenciaci&#243;n y navegaci&#243;n entre actividades, estados de finalizaci&#243;n
+        m&#225;s detallados y mayor capacidad de almacenamiento de datos.
+      </p>
+      <p>
+        Es ideal para cursos complejos, aunque no todos los LMS soportan todas sus ediciones.
+      </p>
+      <button class="btn-solid" (click)="seleccionarVersion('2004')">Elegir SCORM 2004 y continuar</button>
+    </article>
+  </div>
+</div>

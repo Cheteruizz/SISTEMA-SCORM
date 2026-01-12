@@ -43,6 +43,12 @@ $dorado: #d4af37;             // Para la flecha
   padding-top: 20px;
 }
 
+.icono-principal {
+  width: 130px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
 // Cabecera
 .icono-laptop img {
   width: 120px; // Ajusta según tu imagen
@@ -109,6 +115,16 @@ $dorado: #d4af37;             // Para la flecha
       box-shadow: 0 0 5px rgba($borde-azul, 0.5);
     }
   }
+
+  select.input-borde-azul {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid $borde-azul;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: white;
+    outline: none;
+  }
 }
 
 .texto-ayuda-container {
@@ -160,4 +176,8 @@ $dorado: #d4af37;             // Para la flecha
   font-weight: bold;
   // Simular efecto metálico simple
   text-shadow: 1px 1px 0px #b7950b; 
+}
+
+.btn-preview {
+  background-color: $azul-oscuro;
 }

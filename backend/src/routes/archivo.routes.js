@@ -12,17 +12,28 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+const sanitizeFilename = (name) => {
+  const base = path.basename(name);
+  return base.replace(/[^A-Za-z0-9._-]/g, '_');
+};
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const unique = `${Date.now()}_${file.originalname}`;
+    const safeName = sanitizeFilename(file.originalname);
+    const unique = `${Date.now()}_${safeName}`;
     cb(null, unique);
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 100 * 1024 * 1024,
+  },
+});
 
 router.post('/upload', upload.single('file'), archivoController.subirArchivo);
 router.get('/', archivoController.listarArchivos);

@@ -1,21 +1,22 @@
-<div class="header-nav">
-        <button class="btn-volver-atras" (click)="volver()">
-            <span class="flecha-azul">&#8617;</span> Volver
-        </button>
+<div class="layout-shell">
+  <button class="back-link" (click)="volver()">
+    &#8592; Volver
+  </button>
+
+  <img src="logoSCORM.png" alt="Logotipo SCORM" class="logo-img">
+
+  <h1>Panel Principal</h1>
+  <p>Gestiona tus paquetes SCORM de forma sencilla y profesional.</p>
+
+  <div class="panel-grid">
+    <div class="panel-card">
+      <button class="btn-outline" (click)="crearPaquete()">Crear nuevo paquete</button>
+      <span>Inicia un proyecto desde cero</span>
+    </div>
+
+    <div class="panel-card">
+      <button class="btn-outline" (click)="historial()">Historial y Borradores</button>
+      <span>Gestiona y retoma tus paquetes creados o en desarrollo.</span>
+    </div>
+  </div>
 </div>
-<img src="logoSCORM.png" alt="Logotipo de la empresa" class="logo-img">
-
-<h2>Panel Principal</h2>
-<p>Gestiona tus paquetes SCORM de forma sencilla y profesional.</p>
-
-<div class="navegacion-layout">
-    <button (click)="crearPaquete()">Crear nuevo paquete</button>
-    <p>Inicia un proyecto desde cero.</p>
-
-    <button (click)="historial()">Historial y Borradores</button>
-    <p>Gestiona y retoma tus paquetes creados o en desarrollo.</p>
-    <!--Falta meter el historial de paquetes y los borradores-->
-</div>
-<!-- aquí aparecerán las páginas -->
-<router-outlet></router-outlet>
-

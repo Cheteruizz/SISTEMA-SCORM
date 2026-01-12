@@ -1,0 +1,77 @@
+.layout-shell {
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px 20px 60px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.logo-img {
+  width: 150px;
+  height: auto;
+}
+
+h1 {
+  color: var(--color-principal);
+  margin: 0;
+  font-size: 2.1rem;
+}
+
+p {
+  color: #4a4a4a;
+  margin: 0 0 10px;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 40px;
+  width: 100%;
+  max-width: 760px;
+  margin-top: 10px;
+}
+
+.panel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.panel-card span {
+  color: #6b6b6b;
+  font-size: 0.95rem;
+}
+
+.btn-outline {
+  background: white;
+  color: var(--color-principal);
+  border: 2px solid var(--color-principal);
+  padding: 12px 36px;
+  border-radius: 40px;
+  font-size: 1.05rem;
+  text-decoration: underline;
+  margin: 0;
+}
+
+.back-link {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: var(--color-principal);
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .panel-grid {
+    grid-template-columns: 1fr;
+  }
+}

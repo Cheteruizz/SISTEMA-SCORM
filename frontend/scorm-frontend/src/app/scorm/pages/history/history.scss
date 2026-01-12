@@ -1,0 +1,47 @@
+.history-shell {
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px 20px 60px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.logo-img {
+  width: 150px;
+  height: auto;
+}
+
+h1 {
+  margin: 0;
+  color: var(--color-principal);
+}
+
+p {
+  color: #555;
+  margin: 0;
+}
+
+.history-card {
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid var(--color-principal);
+  border-radius: 24px;
+  padding: 30px;
+  max-width: 700px;
+}
+
+.back-link {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: var(--color-principal);
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 0;
+}

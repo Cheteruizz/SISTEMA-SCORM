@@ -13,6 +13,28 @@
   padding-bottom: 50px; 
 }
 
+.header-nav {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.btn-volver-atras {
+  background: none;
+  border: none;
+  color: var(--color-principal);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.flecha-azul {
+  font-size: 1.2rem;
+}
+
 /* =========================================
    CABECERA
    ========================================= */

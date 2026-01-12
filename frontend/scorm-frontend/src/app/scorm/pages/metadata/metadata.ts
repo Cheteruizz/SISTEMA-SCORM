@@ -2,64 +2,118 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ScormService } from '../../../services/scorm.service';
+import { ScormStateService } from '../../../services/scorm-state.service';
 
-// Definimos los nombres de los pasos del formulario
 type Paso = 'explicacion' | 'infoBasica' | 'autoria';
 
 @Component({
   selector: 'app-metadata',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './metadata.html',     
-  styleUrls: ['./metadata.scss']      
+  templateUrl: './metadata.html',
+  styleUrls: ['./metadata.scss'],
 })
 export class MetadataComponent {
-  
   private fb = inject(FormBuilder);
   private router = inject(Router);
-  
-  // Estado para controlar el paso actual del formulario
-  pasoActual: Paso = 'explicacion';
+  private scorm = inject(ScormService);
+  private state = inject(ScormStateService);
 
-  // Formulario principal
+  pasoActual: Paso = 'explicacion';
   metadataForm: FormGroup;
 
   constructor() {
     this.metadataForm = this.fb.group({
-      // Paso 2: Información básica
       titulo: ['', Validators.required],
       descripcion: [''],
       idioma: ['es', Validators.required],
-      
-      // Paso 3: Información de autoría
       autor: [''],
       organizacion: [''],
-      entidadPublicadora: ['']
+      entidadPublicadora: [''],
     });
   }
 
-  // Función para cambiar el paso actual (dentro de la misma pantalla)
   cambiarPaso(nuevoPaso: Paso) {
     this.pasoActual = nuevoPaso;
   }
 
-  // ✅ ACTUALIZADO: Función para el botón "Volver" (Sale de la pantalla)
   volver() {
-    this.router.navigate(['/layout']); 
+    this.router.navigate(['/layout']);
   }
 
-  // Función para "Continuar configurando"
   onSubmitMetadata() {
-    if (this.metadataForm.valid) {
-      // 1. Aquí iría la lógica de guardado real (servicio/localStorage)
-      console.log('Datos guardados en Metadata:', this.metadataForm.value);
-      
-      // 2. Navegamos a la siguiente pantalla: Organizations
-      this.router.navigate(['/organizations']); 
-
-    } else {
+    if (!this.metadataForm.valid) {
       this.metadataForm.markAllAsTouched();
-      alert('Por favor, completa los campos obligatorios antes de continuar.');
+      alert('Completa los campos obligatorios antes de continuar.');
+      return;
     }
+
+    const userId = this.state.getUserId();
+    if (!userId) {
+      alert('Debes iniciar sesion para continuar.');
+      this.router.navigate(['/home']);
+      return;
+    }
+
+    const values = this.metadataForm.value;
+    const version = this.state.getVersion();
+
+    this.scorm
+      .crearProyecto({
+        id_usuario: userId,
+        titulo: values.titulo,
+        descripcion: values.descripcion,
+        version_scorm: version,
+        estado: 'en_edicion',
+      })
+      .subscribe({
+        next: (proyecto) => {
+          const projectId = proyecto.id_proyecto;
+          this.state.setProjectId(projectId);
+
+          this.scorm
+            .crearMetadata({
+              id_proyecto: projectId,
+              idioma: values.idioma,
+              autor_principal: values.autor,
+              organizacion: values.organizacion,
+              entidad_publicadora: values.entidadPublicadora,
+              descripcion_detallada: values.descripcion,
+            })
+            .subscribe();
+
+          const manifestId = `MANIFEST_${projectId}`;
+          this.scorm
+            .crearManifest({
+              id_proyecto: projectId,
+              identificador: manifestId,
+              version: '1.0',
+            })
+            .subscribe({
+              next: (manifest) => {
+                this.state.setManifestId(manifest.id_manifest);
+                this.scorm
+                  .crearOrganizacion({
+                    id_manifest: manifest.id_manifest,
+                    identificador: `ORG_${projectId}`,
+                    titulo: values.titulo,
+                    es_principal: 1,
+                  })
+                  .subscribe({
+                    next: (org) => {
+                      this.state.setOrganizationId(org.id_organizacion);
+                      this.router.navigate(['/validation']);
+                    },
+                    error: () => alert('Error al crear organizacion.'),
+                  });
+              },
+              error: () => alert('Error al crear manifest.'),
+            });
+        },
+        error: () => {
+          alert('Error al crear proyecto.');
+        },
+      });
   }
 }

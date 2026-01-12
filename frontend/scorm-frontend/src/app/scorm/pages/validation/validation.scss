@@ -1,0 +1,91 @@
+.validation-shell {
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px 20px 60px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.logo-img {
+  width: 150px;
+  height: auto;
+}
+
+h1 {
+  color: var(--color-principal);
+  margin: 0;
+  font-size: 2rem;
+}
+
+p {
+  color: #555;
+  max-width: 860px;
+  margin: 0;
+}
+
+.scorm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 30px;
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 20px;
+}
+
+.scorm-card {
+  background: white;
+  border: 2px solid var(--color-principal);
+  border-radius: 28px;
+  padding: 24px 26px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 320px;
+}
+
+.scorm-card h2 {
+  color: var(--color-principal);
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.scorm-card p {
+  color: #3f3f3f;
+  font-size: 0.95rem;
+}
+
+.btn-solid {
+  margin-top: auto;
+  background: var(--color-principal);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.back-link {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: var(--color-principal);
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 0;
+}
+
+@media (max-width: 800px) {
+  .scorm-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,3 +1,10 @@
 .env
 backend/.env
+node_modules
+backend/node_modules
+frontend/scorm-frontend/node_modules
+backend/src/uploads
+backend/src/packages
+backend/*.zip
+backend/*.html
 "" 

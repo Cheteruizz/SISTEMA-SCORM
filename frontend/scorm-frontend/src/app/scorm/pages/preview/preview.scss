@@ -1,0 +1,134 @@
+.preview-shell {
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px 20px 60px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.logo-img {
+  width: 150px;
+  height: auto;
+}
+
+h1 {
+  margin: 0;
+  color: var(--color-principal);
+}
+
+p {
+  color: #555;
+  margin: 0;
+}
+
+.preview-section {
+  width: 100%;
+  max-width: 920px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #d6e6df;
+  border-radius: 24px;
+  padding: 24px;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.preview-section h2 {
+  margin: 0 0 16px;
+  color: var(--color-principal);
+  text-align: center;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.preview-grid .full {
+  grid-column: span 2;
+}
+
+.preview-box {
+  border: 2px solid var(--color-principal);
+  border-radius: 18px;
+  padding: 12px 16px;
+  background: white;
+  color: var(--color-principal);
+  min-height: 44px;
+}
+
+.modulo-card {
+  border: 2px solid var(--color-principal);
+  border-radius: 20px;
+  padding: 16px;
+  margin-top: 12px;
+  background: white;
+}
+
+.modulo-card h3 {
+  margin: 0 0 10px;
+  color: var(--color-principal);
+}
+
+.leccion-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.leccion-row:last-child {
+  border-bottom: none;
+}
+
+.recursos-lista {
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.acciones-finales {
+  margin-top: 20px;
+}
+
+.btn-solid {
+  background: var(--color-principal);
+  color: white;
+  border: none;
+  padding: 12px 40px;
+  border-radius: 30px;
+  text-decoration: underline;
+}
+
+.back-link {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: var(--color-principal);
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 0;
+}
+
+.empty-state {
+  color: #666;
+  text-align: center;
+  font-style: italic;
+  padding: 10px 0;
+}
+
+@media (max-width: 720px) {
+  .preview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-grid .full {
+    grid-column: span 1;
+  }
+}
