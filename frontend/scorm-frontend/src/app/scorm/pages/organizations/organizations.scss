@@ -1,0 +1,260 @@
+/* =========================================
+   ESTRUCTURA PRINCIPAL (Igual que Metadata)
+   ========================================= */
+/* Barra superior alineada a la izquierda */
+.barra-superior {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.boton-volver {
+  margin: 0 !important;
+  padding: 8px 20px !important;
+  font-size: 0.95rem !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  cursor: pointer;
+}
+
+/* Contenido Central */
+.contenido-central {
+  width: 100%;
+  max-width: 700px; /* Ancho controlado para elegancia */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* =========================================
+   TEXTOS Y CABECERAS
+   ========================================= */
+.cabecera-seccion {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h1 {
+    color: var(--color-principal);
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .subtitulo {
+    color: #666;
+    margin-top: 0;
+  }
+}
+
+.titulo-modulo-actual {
+    color: var(--color-principal);
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--color-principal);
+    padding-bottom: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+
+
+.campo-formulario {
+  width: 100%;
+  margin-bottom: 15px;
+  
+  label {
+    display: block;
+    color: var(--color-principal);
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: left;
+    padding-left: 5px;
+  }
+
+  /* FORZAMOS ESTILOS DE INPUT (Override del global) */
+  input, textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    text-align: left !important;
+    box-sizing: border-box;
+    border-radius: 15px !important;
+    padding: 12px 15px !important;
+    background: #fff;
+    border: 2px solid var(--color-principal);
+    color: var(--color-principal);
+    font-family: inherit;
+    font-size: 1rem;
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 5px rgba(10, 61, 98, 0.3);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+}
+
+/* =========================================
+   BOTONES
+   ========================================= */
+.acciones-paso {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.btn-continuar {
+  /* Hereda color del global, solo ajustamos padding/width si hace falta */
+  width: auto;
+  min-width: 200px;
+  font-weight: bold;
+  
+  &.pequeno {
+      min-width: 120px;
+      padding: 8px 20px;
+      font-size: 1rem;
+      margin-top: 10px;
+  }
+}
+
+.btn-secundario {
+  background: transparent;
+  border: 2px solid var(--color-principal);
+  color: var(--color-principal);
+  padding: 10px 30px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+  transition: all 0.3s;
+
+  &:hover {
+    background: var(--color-principal);
+    color: white;
+  }
+}
+
+.navegacion-alternativa {
+  text-align: center;
+  margin-top: 20px;
+  p { margin-bottom: 5px; }
+}
+
+/* =========================================
+   LISTA DE ITEMS (Módulos y Lecciones)
+   ========================================= */
+.lista-contenedor {
+  width: 100%;
+}
+
+.tarjeta-item {
+  background: white;
+  border: 1px solid var(--color-principal);
+  border-radius: 20px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .id-badge {
+    background: var(--color-principal);
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+  }
+
+  .nombre-item {
+    font-weight: bold;
+    color: var(--color-principal);
+    font-size: 1.1rem;
+  }
+
+  .contador-lecciones {
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  .btn-gestion {
+    background: none;
+    border: none;
+    color: var(--color-principal);
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9rem;
+    
+    &:hover { text-decoration: underline; }
+  }
+}
+
+/* Lista de lecciones (más compacta) */
+.item-leccion {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+    color: var(--color-principal);
+
+    &:last-child { border-bottom: none; }
+
+    .btn-eliminar {
+        color: #d93025;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: bold;
+        &:hover { text-decoration: underline; }
+    }
+}
+
+.mensaje-vacio {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 20px;
+}
+
+/* Animación suave de entrada */
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .tarjeta-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        
+        .btn-gestion {
+            align-self: flex-end;
+            background: var(--color-principal);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+        }
+    }
+}

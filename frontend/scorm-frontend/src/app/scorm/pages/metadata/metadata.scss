@@ -1,0 +1,175 @@
+/* No re-declaramos variables ni body. 
+   Heredamos todo de styles.scss y solo ajustamos lo necesario para este formulario.
+*/
+
+.contenedor-metadatos {
+  /* Forzamos que ocupe un buen ancho, superando el límite visual del login */
+  width: 90%; 
+  max-width: 800px; /* Un tope para pantallas gigantes */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Espacio extra abajo para que no se corte en móviles */
+  padding-bottom: 50px; 
+}
+
+/* =========================================
+   CABECERA
+   ========================================= */
+.cabecera-comun {
+  width: 100%;
+  text-align: center;
+}
+
+/* Sobreescribimos la imagen global (255px es muy grande para un icono de cabecera aquí) */
+.icono-principal {
+  width: 120px !important; 
+  height: auto !important;
+  margin-bottom: 15px;
+}
+
+/* =========================================
+   CAJA EXPLICATIVA (Paso 1) - MEJORADA
+   ========================================= */
+.caja-explicativa {
+  width: 100%;
+  border: 2px solid var(--color-principal);
+  border-radius: 30px;
+  
+  /* Aumentamos el relleno para dar aire alrededor */
+  padding: 10px 20px; 
+  
+  margin-bottom: 30px;
+  background-color: white;
+  box-sizing: border-box;
+  
+  /* Flexbox para centrar perfectamente el contenido interno */
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  
+  h2 { 
+    font-size: 1.5rem; 
+    text-align: center;
+    margin-bottom: 10px; /* Separación entre título y texto */
+    color: var(--color-principal);
+  }
+  
+  p { 
+    padding-left: 20px;
+    color: var(--color-principal);
+  }
+}
+
+/* =========================================
+   FORMULARIO Y CAMPOS
+   ========================================= */
+form {
+  width: 100%;
+}
+
+.campo-formulario {
+  width: 100%;
+  margin-bottom: 20px;
+  
+  label {
+    display: block;
+    color: var(--color-principal);
+    font-weight: bold;
+    margin-bottom: 8px;
+    text-align: left; /* Las etiquetas se leen mejor a la izquierda */
+    padding-left: 10px;
+  }
+
+  /* SOBREESCRIBIMOS LOS INPUTS GLOBALES 
+     El global tiene max-width: 350px y text-align: center. 
+     Aquí necesitamos que ocupen todo y el texto esté a la izquierda.
+  */
+  input, textarea, select {
+    width: 100% !important;     /* Rompemos el límite de 350px */
+    max-width: 100% !important; /* Ocupar todo el contenedor padre */
+    text-align: left !important;/* Escribir de izquierda a derecha */
+    box-sizing: border-box;     /* Para que el padding no rompa el ancho */
+    border-radius: 20px !important; /* Un poco menos redondo para textos largos */
+  }
+
+  /* Estilos específicos para textarea (que no están en el global) */
+  textarea {
+    display: block;
+    padding: 12px 20px;
+    background: white;
+    border: 2px solid var(--color-principal);
+    font-size: 1.1rem;
+    color: var(--color-principal);
+    outline: none;
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    
+    &:focus {
+      box-shadow: 0 0 8px rgba(11, 46, 78, 0.3);
+    }
+  }
+}
+
+/* =========================================
+   SELECT PERSONALIZADO
+   (El global no tiene estilos de select, los creamos reutilizando variables)
+   ========================================= */
+.select-wrapper {
+  position: relative;
+  
+  select {
+    appearance: none;
+    cursor: pointer;
+    background: white;
+    border: 2px solid var(--color-principal);
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    color: var(--color-principal);
+  }
+  
+  .flecha-abajo {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-principal);
+    pointer-events: none;
+  }
+}
+
+/* =========================================
+   BOTONES
+   ========================================= */
+/* El estilo base del botón ya viene del global. 
+   Solo ajustamos la posición del botón "Volver" */
+
+.barra-superior {
+  width: 100%;                 /* Ocupa todo el ancho de la pantalla */
+  display: flex;               /* Activa el modo flexible */
+  justify-content: flex-start; /* CLAVE: Manda todo el contenido a la IZQUIERDA */
+  margin-bottom: 20px;         /* Espacio debajo del botón */
+  padding-left: 10px;          /* Un pequeño respiro para que no toque el borde exacto */
+}
+
+.boton-volver {
+  margin: 0 !important;        /* Quitamos márgenes automáticos */
+  padding: 7px 15px !important;
+  font-size: 1rem !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;                    /* Espacio entre la flecha y el texto */
+  
+  /* Aseguramos que el botón no se estire raro */
+  width: auto;                 
+}
+
+.error-mensaje {
+  color: #d93025;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-left: 10px;
+  margin-top: 5px;
+  text-align: left;
+}

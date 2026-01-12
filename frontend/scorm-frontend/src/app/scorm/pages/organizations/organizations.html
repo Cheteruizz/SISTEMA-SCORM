@@ -1,105 +1,109 @@
-<div class="container">
+<div class="contenedor-organizacion">
 
-    <div class="btn-back-header" (click)="irAtras()">
-        Volver
+  <div class="barra-superior">
+    <button class="boton-volver" (click)="irAtras()">
+      ← Volver {{ vistaActual === 'lecciones' ? 'a la lista' : (vistaActual === 'lista' ? 'al editor' : 'al inicio') }}
+    </button>
+  </div>
+
+  <div class="contenido-central">
+
+    <div class="cabecera-seccion">
+      <h1>Organización del Curso</h1>
+      <p class="subtitulo" *ngIf="vistaActual === 'creacion'">Puedes crear tantos módulos como necesites para estructurar tu curso. Cada módulo agrupará sus lecciones correspondientes.Una vez creado al menos un módulo, podrás añadir sus lecciones.</p>
     </div>
 
-    <div class="header-center">
-        <h1>Organización del Curso</h1>
-    </div>
-
-    <div id="vista-creacion" *ngIf="vistaActual === 'creacion'">
-        <p class="description">
-            Puedes crear tantos módulos como necesites.
-        </p>
-
-        <h3>Nuevo Módulo:</h3>
-
-        <div class="form-layout">
-            <div class="col-left">
-                <div class="input-group">
-                    <label>Nombre del Módulo:</label>
-                    <input type="text" [(ngModel)]="nuevoModulo.nombre">
-                </div>
-                <div class="input-group">
-                    <label>ID Único Módulo:</label>
-                    <input type="text" [(ngModel)]="nuevoModulo.id">
-                </div>
-                <div class="input-group">
-                    <label>Descripción:</label>
-                    <input type="text" [(ngModel)]="nuevoModulo.descripcion">
-                </div>
-                <div class="input-group">
-                    <label>Duración:</label>
-                    <input type="text" [(ngModel)]="nuevoModulo.duracion">
-                </div>
-            </div>
-
-            <div class="col-right">
-                <button class="btn-blue" (click)="crearModulo()">Crear Módulo</button>
-                
-                <p class="info-text">
-                    Módulos creados: {{ modulos.length }}
-                </p>
-
-                <button class="btn-blue" (click)="cambiarVista('lista')">
-                    Ver módulos creados
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="vista-lista" *ngIf="vistaActual === 'lista'">
-        <p class="description">
-            Selecciona un módulo para añadirle lecciones.
-        </p>
-        <h3>Módulos Creados:</h3>
-
-        <div id="lista-contenedor" class="list-container">
-            <p *ngIf="modulos.length === 0" class="empty-msg">No hay módulos aún.</p>
-            
-            <div *ngFor="let mod of modulos; let i = index" class="module-item">
-                <div class="module-info">
-                    <strong>{{mod.id}}</strong> - {{mod.nombre}}
-                </div>
-                
-                <button class="btn-small" (click)="gestionarLecciones(i)">
-                    Gestionar Lecciones
-                </button>
-            </div>
-        </div>
-
-        <div class="actions-right">
-            <button class="btn-blue" (click)="cambiarVista('creacion')">+ Crear otro módulo</button>
-        </div>
-    </div>
-
-    <div id="vista-lecciones" *ngIf="vistaActual === 'lecciones' && moduloActual">
+    <div *ngIf="vistaActual === 'creacion'" class="fade-in">
+      
+      <div class="tarjeta-formulario">
+        <h3>Nuevo Módulo</h3>
         
-        <h3 class="title-lesson">
-            Lecciones de: {{ moduloActual.nombre }}
-        </h3>
-
-        <div class="lecciones-grid">
-            <label>ID Lección:</label>
-            <input type="text" [(ngModel)]="nuevaLeccion.id" class="input-field">
-            
-            <label>Nombre Lección:</label>
-            <input type="text" [(ngModel)]="nuevaLeccion.nombre" class="input-field">
-            
-            <div class="btn-add-lesson">
-                <button class="btn-blue" (click)="crearLeccion()">Añadir lección</button>
-            </div>
+        <div class="campo-formulario">
+          <label>Nombre del Módulo:</label>
+          <input type="text" [(ngModel)]="nuevoModulo.nombre" placeholder="Ej. Introducción a la Física">
         </div>
 
-        <div class="lesson-list-wrapper">
-            <h4 class="subtitle-center">Lecciones en este módulo:</h4>
-            
-            <div *ngFor="let lec of moduloActual.lecciones; let j = index" class="lesson-item">
-                <span>{{lec.id}} - {{lec.nombre}}</span>
-                <span class="btn-delete" (click)="borrarLeccion(j)">Eliminar</span>
-            </div>
+        <div class="campo-formulario">
+          <label>ID Único:</label>
+          <input type="text" [(ngModel)]="nuevoModulo.id" placeholder="Ej. MOD-01">
         </div>
+
+        <div class="campo-formulario">
+          <label>Descripción (Opcional):</label>
+          <textarea [(ngModel)]="nuevoModulo.descripcion" placeholder="Breve resumen del módulo..."></textarea>
+        </div>
+
+        <div class="campo-formulario">
+          <label>Duración estimada:</label>
+          <input type="text" [(ngModel)]="nuevoModulo.duracion" placeholder="Ej. 2 horas">
+        </div>
+
+        <div class="acciones-paso">
+          <button class="btn-continuar" (click)="crearModulo()">Crear Módulo</button>
+        </div>
+      </div>
+
+      <div class="navegacion-alternativa">
+        <p>Tienes {{ modulos.length }} módulos creados.</p>
+        <button class="btn-secundario" (click)="cambiarVista('lista')">Ver lista de módulos</button>
+      </div>
+
     </div>
 
+    <div *ngIf="vistaActual === 'lista'" class="fade-in">
+      
+      <div class="lista-contenedor">
+        <div *ngIf="modulos.length === 0" class="mensaje-vacio">
+          <p>No hay módulos creados todavía.</p>
+        </div>
+
+        <div *ngFor="let mod of modulos; let i = index" class="tarjeta-item">
+          <div class="info-item">
+            <span class="id-badge">{{ mod.id }}</span>
+            <span class="nombre-item">{{ mod.nombre }}</span>
+            <span class="contador-lecciones">{{ mod.lecciones.length }} lecciones</span>
+          </div>
+          <button class="btn-gestion" (click)="gestionarLecciones(i)">
+            Gestionar Lecciones →
+          </button>
+        </div>
+      </div>
+
+      <div class="acciones-paso">
+        <button class="btn-continuar" (click)="cambiarVista('creacion')">+ Crear otro módulo</button>
+      </div>
+    </div>
+
+    <div *ngIf="vistaActual === 'lecciones' && moduloActual" class="fade-in">
+      
+      <h3 class="titulo-modulo-actual">Módulo: {{ moduloActual.nombre }}</h3>
+
+      <div class="tarjeta-formulario mini">
+        <h4>Añadir Lección</h4>
+        <div class="campo-formulario">
+            <label>Nombre Lección:</label>
+            <input type="text" [(ngModel)]="nuevaLeccion.nombre">
+        </div>
+        <div class="campo-formulario">
+            <label>ID Lección:</label>
+            <input type="text" [(ngModel)]="nuevaLeccion.id">
+        </div>
+        <button class="btn-continuar pequeno" (click)="crearLeccion()">+ Añadir</button>
+      </div>
+
+      <div class="lista-lecciones-wrapper">
+        <h4>Lecciones actuales:</h4>
+        <div *ngIf="moduloActual.lecciones.length === 0" class="mensaje-vacio">
+            <small>Este módulo no tiene lecciones.</small>
+        </div>
+
+        <div *ngFor="let lec of moduloActual.lecciones; let j = index" class="item-leccion">
+          <span><strong>{{lec.id}}</strong> - {{lec.nombre}}</span>
+          <span class="btn-eliminar" (click)="borrarLeccion(j)">Eliminar</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
 </div>

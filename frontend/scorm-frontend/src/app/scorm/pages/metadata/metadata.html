@@ -1,52 +1,111 @@
+<div class="contenedor-metadatos">
+  
+  <div class="header-nav">
+    <button class="btn-volver-atras" (click)="volver()">
+      <span class="flecha-azul">&#8617;</span>
+    </button>
+  </div>
 
-    <div class="main-container">
+  <div class="contenido-central">
+    <div class="cabecera-comun">
+      <img src="logoSCORM.png" alt="Logo SCORM" class="icono-principal">
+      <h1 class="titulo-principal">Metadatos del Paquete</h1>
+    </div>
+
+    @if (pasoActual === 'explicacion') {
+      <div class="paso-contenido paso-explicacion">
+        <p class="subtitulo-principal">Define la información descriptiva de tu paquete SCORM.</p>
         
-        <div class="icon-header">
+        <div class="caja-explicativa">
+          <h2>¿Qué son los metadatos SCORM?</h2>
+          <p>
+            Los metadatos describen tu paquete SCORM e incluyen título, descripción, autor, idioma y otros datos 
+            que permiten que plataformas como Moodle, Canvas o Blackboard organicen y encuentren tu contenido fácilmente.
+          </p>
         </div>
 
-        <h1>Metadatos del Paquete</h1>
-        <p class="subtitle">Define la información descriptiva de tu paquete SCORM.</p>
-        
-        <h3 class="section-title">Información básica del curso</h3>
+        <div class="acciones-paso">
+          <button class="btn-continuar" (click)="cambiarPaso('infoBasica')">Comenzar configuración</button>
+        </div>
+      </div>
+    }
 
-        <form class="metadata-form">
+    <form [formGroup]="metadataForm" (ngSubmit)="onSubmitMetadata()">
+
+      @if (pasoActual === 'infoBasica') {
+        <div class="paso-contenido">
+          <div class="encabezado-seccion">
+            <h2 class="subtitulo-seccion">Información básica del curso</h2>
+            <p class="descripcion-seccion">Rellena los datos principales que identificarán tu curso.</p>
+          </div>
+
+          <div class="grid-formulario">
+            <div class="campo-formulario titulo-full">
+              <label>Título del curso:</label>
+              <input type="text" formControlName="titulo" placeholder="Ej: Matemáticas Avanzadas">
+              @if (metadataForm.get('titulo')?.invalid && metadataForm.get('titulo')?.touched) {
+                <span class="error-mensaje">El título es obligatorio</span>
+              }
+            </div>
+
+            <div class="campo-formulario descripcion-full">
+              <label>Descripción del curso:</label>
+              <textarea rows="4" formControlName="descripcion" placeholder="Escribe una breve descripción..."></textarea>
+            </div>
+
+            <div class="campo-formulario campo-idioma">
+              <label>Idioma:</label>
+              <div class="select-wrapper">
+                <select formControlName="idioma">
+                  <option value="es">Español</option>
+                  <option value="en">Inglés</option>
+                  <option value="fr">Francés</option>
+                </select>
+                <span class="flecha-abajo">&#9660;</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="acciones-paso">
+            <button type="button" class="btn-continuar" (click)="cambiarPaso('autoria')">Siguiente paso</button>
+          </div>
+        </div>
+      }
+
+      @if (pasoActual === 'autoria') {
+        <div class="paso-contenido">
+          <div class="encabezado-seccion">
+            <h2 class="subtitulo-seccion">Información de autoría</h2>
+            <p class="descripcion-seccion">Indica quién es responsable del contenido educativo.</p>
+          </div>
+
+          <div class="grid-formulario tres-columnas">
+            <div class="campo-formulario">
+              <label>Autor principal:</label>
+              <input type="text" formControlName="autor">
+            </div>
+
+            <div class="campo-formulario">
+              <label>Organización:</label>
+              <input type="text" formControlName="organizacion">
+            </div>
+
+            <div class="campo-formulario">
+              <label>Entidad publicadora:</label>
+              <input type="text" formControlName="entidadPublicadora">
+              <span class="texto-ayuda-input">Entidad que publica o patrocina este contenido</span>
+            </div>
+          </div>
+
+          <div class="acciones-paso final">
+             <button type="button" class="btn-secundario" (click)="cambiarPaso('infoBasica')">Atrás</button>
             
-            <div class="form-row horizontal">
-                <label for="titulo">Título del curso:</label>
-                <input type="text" id="titulo" value="Matemáticas 1" class="input-box">
-            </div>
-
-            <div class="form-row horizontal">
-                <label for="descripcion">Descripción del<br>curso:</label>
-                <textarea id="descripcion" class="input-box area"></textarea>
-            </div>
-
-            <div class="form-row columns">
-                
-                <div class="col-group">
-                    <label for="idioma">Idioma:</label>
-                    <div class="select-wrapper">
-                        <select id="idioma" class="select-box">
-                            <option value="en">Inglés</option>
-                            <option value="es">Español</option>
-                        </select>
-                        <svg class="arrow-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-                    </div>
-                </div>
-
-                <div class="col-group">
-                    <label for="version">Versión del curso:</label>
-                    <div class="select-wrapper">
-                        <select id="version" class="select-box">
-                            <option value="1.2">1.2</option>
-                            <option value="2004">2004</option>
-                        </select>
-                        <svg class="arrow-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-                    </div>
-                </div>
-
-            </div>
-
-        </form>
-
-    </div>
+            <button type="submit" class="btn-continuar btn-final"> 
+              Continuar configurando &rarr;
+            </button>
+          </div>
+        </div>
+      }
+    </form>
+  </div>
+</div>

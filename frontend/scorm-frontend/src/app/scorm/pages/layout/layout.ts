@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-layout',
@@ -8,4 +9,21 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './layout.html',
   styleUrls: ['./layout.scss'],
 })
-export class LayoutComponent {}
+export class LayoutComponent {
+  private router = inject(Router);
+
+
+
+  crearPaquete(){
+    //Va a la pantalla de crear paquetes
+    this.router.navigate(['/metadata']);
+  }
+
+  historial(){
+    //Va al historial de paquetes creados
+  }
+
+  volver(){
+    this.router.navigate(['/home']);
+  }
+}
