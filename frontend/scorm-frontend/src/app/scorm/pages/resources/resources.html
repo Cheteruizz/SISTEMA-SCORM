@@ -43,12 +43,12 @@
           <label>Tipo de Archivo:</label>
           <input type="file" formControlName="tipoArchivo" class="input-borde-azul"
                  (change)="onFileSelected($event)"
-                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.mp4,.avi,.mov,.zip,.rar,.scorm,.html">
+                 accept=".html,.js,.css,.json,.png,.jpg,.jpeg,.svg,.gif,.mp4,.webm,.mp3,.wav,.pdf">
         </div>
 
         <div class="texto-ayuda-container">
           <p class="texto-ayuda">
-            Este sistema permite adjuntar archivos PDF, video, imagenes, documentos y ZIP.
+            Este sistema permite adjuntar HTML, JS, CSS, JSON, imagenes, audio, video y PDF.
           </p>
         </div>
       </div>
@@ -58,6 +58,8 @@
   <div class="acciones-inferiores">
     <button class="btn-accion" (click)="eliminarArchivo()">Eliminar Archivo</button>
     <button class="btn-accion" (click)="subirArchivo()">Subir Archivo</button>
+    <button class="btn-accion" (click)="irAEditorSco()">Editor SCO</button>
+    <button class="btn-accion" (click)="irAImportar()">Importar Manifest</button>
     <button class="btn-accion btn-preview" (click)="irAVistaPrevia()">Vista previa</button>
   </div>
 </div>

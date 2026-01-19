@@ -34,6 +34,9 @@ export class PreviewComponent implements OnInit {
   metadata: any = null;
   modulos: ModuloResumen[] = [];
   versionLabel = '1.2';
+  scormGenerado = false;
+  validacion: { valido: boolean; errores: string[]; warnings: string[] } | null = null;
+  validando = false;
 
   ngOnInit() {
     const projectId = this.state.getProjectId();
@@ -119,6 +122,25 @@ export class PreviewComponent implements OnInit {
       return;
     }
 
+    this.validando = true;
+    this.scorm.validarScorm(projectId).subscribe({
+      next: (resultado) => {
+        this.validacion = resultado;
+        this.validando = false;
+        if (!resultado.valido) {
+          alert('Hay errores de validacion. Revisa la lista antes de generar.');
+          return;
+        }
+        this.generarScormZip(projectId);
+      },
+      error: () => {
+        this.validando = false;
+        alert('No se pudo validar el proyecto.');
+      },
+    });
+  }
+
+  private generarScormZip(projectId: number) {
     const version = this.state.getVersion();
     const generar$ =
       version === '2004_4th' ? this.scorm.generarScorm2004(projectId) : this.scorm.generarScorm(projectId);
@@ -131,8 +153,14 @@ export class PreviewComponent implements OnInit {
         link.download = version === '2004_4th' ? `scorm2004_${projectId}.zip` : `scorm_${projectId}.zip`;
         link.click();
         window.URL.revokeObjectURL(url);
+        this.scormGenerado = true;
       },
       error: () => alert('Error al generar SCORM.'),
     });
+  }
+
+  finalizar() {
+    this.state.clearProjectData();
+    this.router.navigate(['/layout']);
   }
 }

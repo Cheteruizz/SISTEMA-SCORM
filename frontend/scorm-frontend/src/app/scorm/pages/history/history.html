@@ -8,7 +8,41 @@
   <h1>Historial y Borradores</h1>
   <p>Aqui veras los paquetes SCORM generados y los proyectos en borrador.</p>
 
-  <div class="history-card">
+  <div class="history-card" *ngIf="cargando">
+    <p>Cargando historial...</p>
+  </div>
+
+  <div class="history-card" *ngIf="!cargando && error">
+    <p>{{ error }}</p>
+  </div>
+
+  <div class="history-card" *ngIf="!cargando && !error && proyectos.length === 0">
     <p>Sin historial todavia. Genera un paquete para verlo aqui.</p>
+  </div>
+
+  <div class="history-list" *ngIf="!cargando && !error && proyectos.length">
+    <div class="history-item" *ngFor="let proyecto of proyectos">
+      <div class="history-header">
+        <h3>{{ proyecto.titulo }}</h3>
+        <span class="badge">{{ proyecto.estado }}</span>
+      </div>
+      <p>
+        Version SCORM: {{ proyecto.version_scorm }} ·
+        Creado: {{ proyecto.fecha_creacion | date:'short' }}
+      </p>
+
+      <div class="history-sub" *ngIf="(paquetesPorProyecto[proyecto.id_proyecto] || []).length">
+        <p>Paquetes generados:</p>
+        <ul>
+          <li *ngFor="let paquete of paquetesPorProyecto[proyecto.id_proyecto]">
+            {{ paquete.version_scorm }} · {{ paquete.fecha_generado | date:'short' }}
+          </li>
+        </ul>
+      </div>
+
+      <div class="history-sub" *ngIf="(paquetesPorProyecto[proyecto.id_proyecto] || []).length === 0">
+        <p>Sin paquetes generados todavia.</p>
+      </div>
+    </div>
   </div>
 </div>

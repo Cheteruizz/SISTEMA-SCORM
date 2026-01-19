@@ -1,0 +1,91 @@
+<div class="sco-shell">
+  <header class="sco-header">
+    <div>
+      <h1>Editor de SCO</h1>
+      <p>Configura el contenido, define el archivo de entrada y prueba el paquete en vivo.</p>
+    </div>
+  </header>
+
+  <section class="sco-panel">
+    <h2>Crear nuevo SCO</h2>
+    <form [formGroup]="scoForm" class="sco-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Titulo</label>
+          <input type="text" formControlName="titulo" placeholder="Nombre del SCO">
+        </div>
+
+        <div class="form-group">
+          <label>Descripcion</label>
+          <textarea formControlName="descripcion" rows="3" placeholder="Descripcion breve"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Archivo de entrada</label>
+          <select formControlName="archivo_entrada">
+            <option value="">Selecciona un archivo</option>
+            <option *ngFor="let archivo of archivos" [value]="archivo.nombre_fisico">
+              {{ archivo.nombre_original }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group inline">
+          <label>Ancho</label>
+          <input type="number" formControlName="ancho">
+        </div>
+
+        <div class="form-group inline">
+          <label>Alto</label>
+          <input type="number" formControlName="alto">
+        </div>
+      </div>
+
+      <div class="archivos-panel">
+        <h3>Archivos incluidos</h3>
+        <div class="archivos-grid">
+          <label *ngFor="let archivo of archivos" class="archivo-chip">
+            <input
+              type="checkbox"
+              [value]="archivo.id_archivo"
+              (change)="toggleArchivo(archivo.id_archivo, $event.target.checked)">
+            <span>{{ archivo.nombre_original }}</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn-primario" type="button" (click)="crearSco()">Guardar SCO</button>
+    </form>
+  </section>
+
+  <section class="sco-panel">
+    <h2>Mis SCOs</h2>
+    <div class="sco-list">
+      <article class="sco-card" *ngFor="let sco of scos">
+        <div>
+          <h3>{{ sco.titulo }}</h3>
+          <p>{{ sco.descripcion || 'Sin descripcion' }}</p>
+        </div>
+        <button class="btn-secundario" (click)="abrirPreview(sco)">Vista en vivo</button>
+      </article>
+    </div>
+  </section>
+
+  <section class="sco-panel" *ngIf="previewUrl">
+    <div class="preview-header">
+      <div>
+        <h2>Preview: {{ previewTitulo }}</h2>
+        <p>Sesion runtime activa: {{ runtimeSessionId || 'pendiente' }}</p>
+      </div>
+      <button class="btn-cerrar" (click)="cerrarPreview()">Cerrar</button>
+    </div>
+    <div class="preview-frame" [style.width.px]="previewSize.width" [style.height.px]="previewSize.height">
+      <iframe
+        [src]="previewUrl"
+        title="Preview SCO"
+        frameborder="0"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </section>
+</div>

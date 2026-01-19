@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
 
 const usuarioRoutes = require('./routes/usuario.routes');
 const proyectoRoutes = require('./routes/proyecto.routes');
@@ -14,11 +16,21 @@ const recursoRoutes = require('./routes/recurso.routes');
 const paqueteRoutes = require('./routes/paquete_generado.routes');
 const metadataRoutes = require('./routes/proyecto_metadata.routes');
 const scormRoutes = require('./routes/scorm.routes');
+const scormImportRoutes = require('./routes/scorm_import.routes');
+const runtimeRoutes = require('./routes/scorm_runtime.routes');
+const scoRoutes = require('./routes/scorm_sco.routes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+const baseDir = path.resolve(__dirname, '..');
+const uploadDir = process.env.UPLOAD_DIR || path.join(baseDir, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+app.use('/uploads', express.static(uploadDir));
 
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/proyectos', proyectoRoutes);
@@ -32,6 +44,9 @@ app.use('/api/recursos', recursoRoutes);
 app.use('/api/paquetes', paqueteRoutes);
 app.use('/api/metadata', metadataRoutes);
 app.use('/api/scorm', scormRoutes);
+app.use('/api/scorm', scormImportRoutes);
+app.use('/api/scorm/runtime', runtimeRoutes);
+app.use('/api/scorm/sco', scoRoutes);
 
 app.get('/', (req, res) => {
   res.send('Backend SCORM funcionando correctamente');

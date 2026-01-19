@@ -23,6 +23,10 @@ export class LayoutComponent {
     this.router.navigate(['/history']);
   }
 
+  importarProyecto(){
+    this.router.navigate(['/importar']);
+  }
+
   volver(){
     this.router.navigate(['/home']);
   }

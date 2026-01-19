@@ -53,4 +53,11 @@ export class ScormStateService {
   getVersion(): string {
     return localStorage.getItem(this.versionKey) || '1.2';
   }
+
+  clearProjectData() {
+    localStorage.removeItem(this.projectKey);
+    localStorage.removeItem(this.manifestKey);
+    localStorage.removeItem(this.orgKey);
+    localStorage.removeItem(this.versionKey);
+  }
 }

@@ -82,29 +82,28 @@ export class ResourcesComponent implements OnInit {
     const file: File = event.target.files[0];
     if (!file) return;
 
-    const limiteMB = 100;
+    const limiteMB = 50;
     const limiteBytes = limiteMB * 1024 * 1024;
     const ext = file.name.split('.').pop()?.toLowerCase() || '';
     const extensionesPermitidas = [
-      'pdf',
+      'html',
+      'js',
+      'css',
+      'json',
+      'png',
       'jpg',
       'jpeg',
-      'png',
+      'svg',
       'gif',
       'mp4',
-      'avi',
-      'mov',
-      'doc',
-      'docx',
-      'txt',
-      'zip',
-      'rar',
-      'scorm',
-      'html',
+      'webm',
+      'mp3',
+      'wav',
+      'pdf',
     ];
 
     if (file.size > limiteBytes) {
-      alert('El archivo supera el limite de 100MB.');
+      alert('El archivo supera el limite de 50MB.');
       event.target.value = '';
       return;
     }
@@ -128,6 +127,14 @@ export class ResourcesComponent implements OnInit {
 
   irAVistaPrevia() {
     this.router.navigate(['/preview']);
+  }
+
+  irAEditorSco() {
+    this.router.navigate(['/editor-sco']);
+  }
+
+  irAImportar() {
+    this.router.navigate(['/importar']);
   }
 
   subirArchivo() {

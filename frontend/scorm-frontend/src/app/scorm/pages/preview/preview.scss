@@ -95,6 +95,19 @@ p {
   margin-top: 20px;
 }
 
+.estado-validacion {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.estado-validacion.ok {
+  color: #0f766e;
+}
+
+.estado-validacion.bad {
+  color: #dc2626;
+}
+
 .btn-solid {
   background: var(--color-principal);
   color: white;

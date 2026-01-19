@@ -1,6 +1,9 @@
 // src/controllers/archivo.controller.js
 const Archivo = require('../models/archivo.model');
 
+const MAX_ARCHIVOS_PROYECTO = 500;
+const MAX_TOTAL_BYTES = 200 * 1024 * 1024;
+
 const subirArchivo = async (req, res) => {
   try {
     const { id_proyecto, id_leccion } = req.body;
@@ -11,6 +14,20 @@ const subirArchivo = async (req, res) => {
 
     if (!id_proyecto) {
       return res.status(400).json({ mensaje: 'id_proyecto es obligatorio' });
+    }
+
+    const totales = await Archivo.obtenerTotalesPorProyecto(id_proyecto);
+    const totalArchivos = Number(totales.total_archivos || 0) + 1;
+    const totalBytes = Number(totales.total_bytes || 0) + Number(req.file.size || 0);
+
+    if (totalArchivos > MAX_ARCHIVOS_PROYECTO) {
+      await require('fs').promises.unlink(req.file.path).catch(() => {});
+      return res.status(400).json({ mensaje: 'Limite de archivos por proyecto alcanzado' });
+    }
+
+    if (totalBytes > MAX_TOTAL_BYTES) {
+      await require('fs').promises.unlink(req.file.path).catch(() => {});
+      return res.status(400).json({ mensaje: 'Limite total de almacenamiento excedido' });
     }
 
     const id_archivo = await Archivo.crear({

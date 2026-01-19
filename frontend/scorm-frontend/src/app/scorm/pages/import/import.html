@@ -1,0 +1,146 @@
+<div class="import-shell">
+  <button class="back-link" (click)="volver()">
+    &#8592; Volver
+  </button>
+
+  <img src="logoSCORM.png" alt="Logo SCORM" class="logo-img">
+
+  <h1>Importar imsmanifest.xml</h1>
+  <p>Sube un manifest y enlaza los recursos con archivos ya cargados en el proyecto.</p>
+
+  <section class="import-card">
+    <form [formGroup]="form" class="import-form">
+      <div class="form-row">
+        <label>Archivo imsmanifest.xml</label>
+        <input type="file" accept=".xml" (change)="onFileSelected($event)">
+      </div>
+
+      <div class="form-row">
+        <label>Mapa de archivos (JSON opcional)</label>
+        <textarea
+          formControlName="archivoMap"
+          rows="4"
+          placeholder='{"content/index.html": 12, "content/style.css": 13}'></textarea>
+      </div>
+
+      <div class="form-row">
+        <label class="toggle">
+          <input type="checkbox" formControlName="dryRun">
+          Validar sin crear registros (dry run)
+        </label>
+      </div>
+
+      <button class="btn-solid" type="button" (click)="importar()" [disabled]="cargando">
+        {{ cargando ? 'Importando...' : 'Importar manifest' }}
+      </button>
+    </form>
+  </section>
+
+  <section class="import-card">
+    <form [formGroup]="zipForm" class="import-form">
+      <h2>Importar ZIP SCORM</h2>
+      <div class="form-row">
+        <label>Archivo ZIP</label>
+        <input type="file" accept=".zip" (change)="onZipSelected($event)">
+      </div>
+
+      <div class="form-row">
+        <label class="toggle">
+          <input type="checkbox" formControlName="crearProyecto">
+          Crear proyecto nuevo desde este ZIP
+        </label>
+      </div>
+
+      <div class="form-row" *ngIf="zipForm.value.crearProyecto">
+        <label>Titulo del proyecto</label>
+        <input type="text" formControlName="titulo" placeholder="Proyecto importado">
+      </div>
+
+      <div class="form-row" *ngIf="zipForm.value.crearProyecto">
+        <label>Descripcion</label>
+        <textarea formControlName="descripcion" rows="3" placeholder="Descripcion opcional"></textarea>
+      </div>
+
+      <div class="form-row">
+        <label class="toggle">
+          <input type="checkbox" formControlName="zipDryRun">
+          Validar sin crear registros (dry run)
+        </label>
+      </div>
+
+      <button class="btn-solid" type="button" (click)="importarZip()" [disabled]="cargandoZip">
+        {{ cargandoZip ? 'Importando...' : 'Importar ZIP' }}
+      </button>
+    </form>
+  </section>
+
+  <section class="import-card" *ngIf="resultado">
+    <h2>Resultado</h2>
+    <p class="estado" [class.ok]="resultado.valido" [class.bad]="!resultado.valido">
+      {{ resultado.valido ? 'Manifest valido' : 'Errores detectados' }}
+    </p>
+    <div *ngIf="resultado.errores?.length">
+      <h3>Errores</h3>
+      <ul>
+        <li *ngFor="let err of resultado.errores">{{ err }}</li>
+      </ul>
+    </div>
+    <div *ngIf="resultado.data">
+      <h3>Resumen</h3>
+      <p>Recursos: {{ resultado.data.resources?.length || 0 }}</p>
+      <p>Organizaciones: {{ resultado.data.organizations?.length || 0 }}</p>
+    </div>
+    <div *ngIf="resultado.data?.resources?.length">
+      <h3>Recursos detectados</h3>
+      <div class="resource-table">
+        <div class="resource-header">
+          <span>Identificador</span>
+          <span>Href</span>
+          <span>Archivo</span>
+        </div>
+        <div class="resource-row" *ngFor="let res of resultado.data.resources">
+          <span>{{ res.identificador }}</span>
+          <span>{{ res.href || '-' }}</span>
+          <span [class.bad]="!res.id_archivo">
+            {{ res.id_archivo ? ('ID ' + res.id_archivo) : 'No encontrado' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="import-card" *ngIf="resultadoZip">
+    <h2>Resultado ZIP</h2>
+    <p class="estado" [class.ok]="resultadoZip.valido" [class.bad]="!resultadoZip.valido">
+      {{ resultadoZip.valido ? 'ZIP valido' : 'Errores detectados' }}
+    </p>
+    <div *ngIf="resultadoZip.errores?.length">
+      <h3>Errores</h3>
+      <ul>
+        <li *ngFor="let err of resultadoZip.errores">{{ err }}</li>
+      </ul>
+    </div>
+    <div *ngIf="resultadoZip.data">
+      <h3>Resumen</h3>
+      <p>Recursos: {{ resultadoZip.data.resources?.length || 0 }}</p>
+      <p>Organizaciones: {{ resultadoZip.data.organizations?.length || 0 }}</p>
+    </div>
+    <div *ngIf="resultadoZip.data?.resources?.length">
+      <h3>Recursos detectados</h3>
+      <div class="resource-table">
+        <div class="resource-header">
+          <span>Identificador</span>
+          <span>Href</span>
+          <span>Archivo</span>
+        </div>
+        <div class="resource-row" *ngFor="let res of resultadoZip.data.resources">
+          <span>{{ res.identificador }}</span>
+          <span>{{ res.href || '-' }}</span>
+          <span [class.bad]="!res.id_archivo">
+            {{ res.id_archivo ? ('ID ' + res.id_archivo) : 'No encontrado' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

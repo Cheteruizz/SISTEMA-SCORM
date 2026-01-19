@@ -32,6 +32,16 @@ export const SCORM_ROUTES: Routes = [
           import('./pages/preview/preview').then(m => m.PreviewComponent),
       },
       {
+        path: 'editor-sco',
+        loadComponent: () =>
+          import('./pages/sco-editor/sco-editor').then(m => m.ScoEditorComponent),
+      },
+      {
+        path: 'importar',
+        loadComponent: () =>
+          import('./pages/import/import').then(m => m.ImportComponent),
+      },
+      {
         path: 'validation',
         loadComponent: () =>
           import('./pages/validation/validation').then(m => m.ValidationComponent),

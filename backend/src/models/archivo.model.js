@@ -81,6 +81,14 @@ const Archivo = {
     ]);
     return result.affectedRows;
   },
+
+  async obtenerTotalesPorProyecto(id_proyecto) {
+    const [rows] = await db.query(
+      'SELECT COUNT(*) AS total_archivos, COALESCE(SUM(tamano_bytes), 0) AS total_bytes FROM archivo WHERE id_proyecto = ?',
+      [id_proyecto]
+    );
+    return rows[0] || { total_archivos: 0, total_bytes: 0 };
+  },
 };
 
 module.exports = Archivo;

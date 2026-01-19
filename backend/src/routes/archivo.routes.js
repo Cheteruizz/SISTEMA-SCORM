@@ -17,6 +17,28 @@ const sanitizeFilename = (name) => {
   return base.replace(/[^A-Za-z0-9._-]/g, '_');
 };
 
+const allowedExtensions = new Set([
+  '.html',
+  '.js',
+  '.css',
+  '.json',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.svg',
+  '.gif',
+  '.mp4',
+  '.webm',
+  '.mp3',
+  '.wav',
+  '.pdf',
+]);
+
+const isAllowedExtension = (filename) => {
+  const ext = path.extname(filename || '').toLowerCase();
+  return allowedExtensions.has(ext);
+};
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -31,11 +53,24 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: 100 * 1024 * 1024,
+    fileSize: 50 * 1024 * 1024,
+  },
+  fileFilter: (req, file, cb) => {
+    if (!isAllowedExtension(file.originalname)) {
+      return cb(new Error('Tipo de archivo no permitido'));
+    }
+    return cb(null, true);
   },
 });
 
-router.post('/upload', upload.single('file'), archivoController.subirArchivo);
+router.post('/upload', (req, res) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ mensaje: err.message || 'Error al subir archivo' });
+    }
+    return archivoController.subirArchivo(req, res);
+  });
+});
 router.get('/', archivoController.listarArchivos);
 router.get('/:id', archivoController.obtenerArchivo);
 router.post('/', archivoController.crearArchivo);

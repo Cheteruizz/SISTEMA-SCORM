@@ -47,6 +47,16 @@ export const routes: Routes = [
     component: HistoryComponent
   },
   {
+    path: 'editor-sco',
+    loadComponent: () =>
+      import('./scorm/pages/sco-editor/sco-editor').then(m => m.ScoEditorComponent),
+  },
+  {
+    path: 'importar',
+    loadComponent: () =>
+      import('./scorm/pages/import/import').then(m => m.ImportComponent),
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'

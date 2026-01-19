@@ -5,5 +5,6 @@ const scormController = require('../controllers/scorm.controller');
 
 router.post('/:id_proyecto/generar-1-2', scormController.generarPaquete12);
 router.post('/:id_proyecto/generar-2004', scormController.generarPaquete2004);
+router.get('/:id_proyecto/validar', scormController.validarProyecto);
 
 module.exports = router;

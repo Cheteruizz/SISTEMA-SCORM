@@ -70,7 +70,31 @@
     </div>
   </section>
 
+  <section class="preview-section" *ngIf="validacion">
+    <h2>Validacion del paquete</h2>
+    <p class="estado-validacion" [class.ok]="validacion.valido" [class.bad]="!validacion.valido">
+      {{ validacion.valido ? 'Validacion correcta' : 'Errores detectados' }}
+    </p>
+    <div *ngIf="validacion.errores?.length">
+      <h3>Errores</h3>
+      <ul>
+        <li *ngFor="let err of validacion.errores">{{ err }}</li>
+      </ul>
+    </div>
+    <div *ngIf="validacion.warnings?.length">
+      <h3>Advertencias</h3>
+      <ul>
+        <li *ngFor="let warn of validacion.warnings">{{ warn }}</li>
+      </ul>
+    </div>
+  </section>
+
   <div class="acciones-finales">
-    <button class="btn-solid" (click)="generarScorm()">Generar SCORM</button>
+    <button class="btn-solid" (click)="generarScorm()" [disabled]="validando">
+      {{ validando ? 'Validando...' : 'Generar SCORM' }}
+    </button>
+    <button class="btn-solid" *ngIf="scormGenerado" (click)="finalizar()">
+      Finalizar y crear otro
+    </button>
   </div>
 </div>
