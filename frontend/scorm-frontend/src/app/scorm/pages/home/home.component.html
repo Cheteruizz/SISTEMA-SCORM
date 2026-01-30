@@ -1,12 +1,16 @@
 <div class="home-shell">
   @if (vistaActual === 'menu') {
-    <img src="logoSCORM.png" alt="Logotipo de la empresa" class="logo-img logo-large">
-    <h1>Sistema Administrador SCORM</h1>
-    <p>Crea, gestiona y exporta paquetes SCORM 1.2 y 2004 de forma sencilla y profesional.</p>
+    <div class="hero-card hero-card--wide">
+      <img src="logoSCORM.png" alt="Logotipo de Manifestum" class="logo-img logo-large">
+      <span class="hero-badge">SCORM 1.2 / 2004</span>
+      <h1>Manifestum</h1>
+      <p class="hero-kicker">Administrador SCORM</p>
+      <p>Gestiona, valida y exporta paquetes SCORM de forma sencilla y profesional.</p>
 
-    <div class="menu-actions">
-      <button class="btn-outline" (click)="cambiarVista('login')">Iniciar sesi&#243;n</button>
-      <button class="btn-outline" (click)="cambiarVista('registro')">Registrarse</button>
+      <div class="menu-actions">
+        <button class="btn-primary" (click)="cambiarVista('login')">Iniciar sesi&#243;n</button>
+        <button class="btn-ghost" (click)="cambiarVista('registro')">Registrarse</button>
+      </div>
     </div>
   }
 
@@ -15,24 +19,26 @@
       &#8592; Volver
     </button>
 
-    <img src="logoSCORM.png" alt="Logotipo de la empresa" class="logo-img">
-    <h1>Inicia sesi&#243;n en tu cuenta</h1>
-    <p>Accede al sistema administrador SCORM para gestionar tus paquetes.</p>
+    <div class="hero-card hero-card--compact">
+      <img src="logoSCORM.png" alt="Logotipo de Manifestum" class="logo-img">
+      <h1>Inicia sesi&#243;n en Manifestum</h1>
+      <p>Accede al administrador SCORM para gestionar tus paquetes.</p>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()" class="auth-form">
-      <input type="email" placeholder="tu@email.com" formControlName="email">
-      <input type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" formControlName="password">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()" class="auth-form">
+        <input type="email" placeholder="tu@email.com" formControlName="email">
+        <input type="password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" formControlName="password">
 
-      <div class="login-row">
-        <label class="checkbox-label">
-          <input type="checkbox" id="recordar" formControlName="recordarme">
-          Recordarme
-        </label>
-        <a class="link" href="#">&#191;Olvidaste tu contrase&#241;a?</a>
-      </div>
+        <div class="login-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="recordar" formControlName="recordarme">
+            Recordarme
+          </label>
+          <a class="link" href="#">&#191;Olvidaste tu contrase&#241;a?</a>
+        </div>
 
-      <button type="submit" class="btn-solid">Iniciar sesi&#243;n</button>
-    </form>
+        <button type="submit" class="btn-primary btn-wide">Iniciar sesi&#243;n</button>
+      </form>
+    </div>
   }
 
   @if (vistaActual === 'registro') {
@@ -40,17 +46,19 @@
       &#8592; Volver
     </button>
 
-    <img src="logoSCORM.png" alt="Logotipo de la empresa" class="logo-img">
-    <h1>Crear una cuenta nueva</h1>
-    <p>Reg&#237;strate para gestionar tus paquetes SCORM de forma sencilla y profesional.</p>
+    <div class="hero-card hero-card--compact">
+      <img src="logoSCORM.png" alt="Logotipo de Manifestum" class="logo-img">
+      <h1>Crear una cuenta en Manifestum</h1>
+      <p>Reg&#237;strate para gestionar tus paquetes SCORM de forma sencilla y profesional.</p>
 
-    <form [formGroup]="registroForm" (ngSubmit)="onSubmitRegistro()" class="auth-form">
-      <input type="text" placeholder="Nombre completo" formControlName="nombre">
-      <input type="email" placeholder="email@ejemplo.com" formControlName="email">
-      <input type="password" placeholder="Contrase&#241;a" formControlName="password">
-      <input type="password" placeholder="Repetir contrase&#241;a" formControlName="repetirPassword">
+      <form [formGroup]="registroForm" (ngSubmit)="onSubmitRegistro()" class="auth-form">
+        <input type="text" placeholder="Nombre completo" formControlName="nombre">
+        <input type="email" placeholder="email@ejemplo.com" formControlName="email">
+        <input type="password" placeholder="Contrase&#241;a" formControlName="password">
+        <input type="password" placeholder="Repetir contrase&#241;a" formControlName="repetirPassword">
 
-      <button type="submit" class="btn-solid">Crear cuenta</button>
-    </form>
+        <button type="submit" class="btn-primary btn-wide">Crear cuenta</button>
+      </form>
+    </div>
   }
 </div>

@@ -208,7 +208,12 @@ const validarValor = (version, key, value) => {
     }
   }
 
-  if (key.endsWith('score.raw') || key.endsWith('score.min') || key.endsWith('score.max')) {
+  if (
+    key.endsWith('score.raw') ||
+    key.endsWith('score.min') ||
+    key.endsWith('score.max') ||
+    key.endsWith('score.scaled')
+  ) {
     if (valueText !== '' && Number.isNaN(Number(valueText))) {
       return buildError(version, is2004 ? 406 : 402, 'Valor invalido');
     }

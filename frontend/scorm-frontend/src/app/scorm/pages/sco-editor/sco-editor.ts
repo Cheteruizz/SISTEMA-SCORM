@@ -46,7 +46,10 @@ export class ScoEditorComponent implements OnInit {
   apiReady = false;
   private initialized = false;
   private terminated = false;
-  private lastError = '0';
+  lastError = '0';
+  private commitTimer: any = null;
+  apiLogs: Array<{ ts: string; action: string; key?: string; value?: string }> = [];
+  commits = 0;
 
   scoForm: FormGroup = this.fb.group({
     titulo: ['', Validators.required],
@@ -162,6 +165,12 @@ export class ScoEditorComponent implements OnInit {
     this.initialized = false;
     this.terminated = false;
     this.lastError = '0';
+    this.apiLogs = [];
+    this.commits = 0;
+    if (this.commitTimer) {
+      clearInterval(this.commitTimer);
+      this.commitTimer = null;
+    }
   }
 
   private prepararApiRuntime(sco: ScoInfo, launchPath: string) {
@@ -182,6 +191,7 @@ export class ScoEditorComponent implements OnInit {
           this.inicializarApi(this.version);
           this.apiReady = true;
           this.cargarCmiInicial();
+          this.commitTimer = setInterval(() => this.commitRuntime(), 30000);
         },
         error: () => alert('No se pudo iniciar la sesion SCORM.'),
       });
@@ -205,6 +215,8 @@ export class ScoEditorComponent implements OnInit {
     this.initialized = false;
     this.terminated = false;
     this.lastError = '0';
+    this.apiLogs = [];
+    this.commits = 0;
     if (version === '2004_4th') {
       (window as any).API_1484_11 = api;
       (window as any).API = null;
@@ -217,6 +229,7 @@ export class ScoEditorComponent implements OnInit {
   private crearApi12() {
     return {
       LMSInitialize: () => {
+        this.registrarEvento('LMSInitialize');
         if (!this.runtimeSessionId) {
           this.setLastError('301', 'Sesion no inicializada');
           return 'false';
@@ -230,6 +243,7 @@ export class ScoEditorComponent implements OnInit {
         return 'true';
       },
       LMSFinish: () => {
+        this.registrarEvento('LMSFinish');
         if (!this.initialized) {
           this.setLastError('301', 'Finalizar antes de inicializar');
           return 'false';
@@ -244,6 +258,7 @@ export class ScoEditorComponent implements OnInit {
         return 'true';
       },
       LMSGetValue: (key: string) => {
+        this.registrarEvento('LMSGetValue', key);
         if (!this.initialized) {
           this.setLastError('301', 'GetValue antes de inicializar');
           return '';
@@ -261,6 +276,7 @@ export class ScoEditorComponent implements OnInit {
         return this.leerCmi(key);
       },
       LMSSetValue: (key: string, value: any) => {
+        this.registrarEvento('LMSSetValue', key, value);
         if (!this.initialized) {
           this.setLastError('301', 'SetValue antes de inicializar');
           return 'false';
@@ -284,6 +300,7 @@ export class ScoEditorComponent implements OnInit {
         return 'true';
       },
       LMSCommit: () => {
+        this.registrarEvento('LMSCommit');
         if (!this.initialized) {
           this.setLastError('301', 'Commit antes de inicializar');
           return 'false';
@@ -305,6 +322,7 @@ export class ScoEditorComponent implements OnInit {
   private crearApi2004() {
     return {
       Initialize: () => {
+        this.registrarEvento('Initialize');
         if (!this.runtimeSessionId) {
           this.setLastError('122', 'Sesion no inicializada');
           return 'false';
@@ -318,6 +336,7 @@ export class ScoEditorComponent implements OnInit {
         return 'true';
       },
       Terminate: () => {
+        this.registrarEvento('Terminate');
         if (!this.initialized) {
           this.setLastError('112', 'Terminate antes de inicializar');
           return 'false';
@@ -332,6 +351,7 @@ export class ScoEditorComponent implements OnInit {
         return 'true';
       },
       GetValue: (key: string) => {
+        this.registrarEvento('GetValue', key);
         if (!this.initialized) {
           this.setLastError('122', 'GetValue antes de inicializar');
           return '';
@@ -349,6 +369,7 @@ export class ScoEditorComponent implements OnInit {
         return this.leerCmi(key);
       },
       SetValue: (key: string, value: any) => {
+        this.registrarEvento('SetValue', key, value);
         if (!this.initialized) {
           this.setLastError('132', 'SetValue antes de inicializar');
           return 'false';
@@ -372,6 +393,7 @@ export class ScoEditorComponent implements OnInit {
         return 'true';
       },
       Commit: () => {
+        this.registrarEvento('Commit');
         if (!this.initialized) {
           this.setLastError('142', 'Commit antes de inicializar');
           return 'false';
@@ -403,6 +425,7 @@ export class ScoEditorComponent implements OnInit {
 
   private commitRuntime() {
     if (!this.runtimeSessionId) return;
+    this.commits += 1;
     const items = Array.from(this.cmiStore.entries()).map(([clave_cmi, valor_cmi]) => ({
       clave_cmi,
       valor_cmi,
@@ -494,7 +517,12 @@ export class ScoEditorComponent implements OnInit {
       return { ok: false, codigo: is2004 ? '406' : '402', mensaje: 'Valor invalido' };
     }
 
-    if (key.endsWith('score.raw') || key.endsWith('score.min') || key.endsWith('score.max')) {
+    if (
+      key.endsWith('score.raw') ||
+      key.endsWith('score.min') ||
+      key.endsWith('score.max') ||
+      key.endsWith('score.scaled')
+    ) {
       if (texto !== '' && Number.isNaN(Number(texto))) {
         return { ok: false, codigo: is2004 ? '406' : '402', mensaje: 'Valor invalido' };
       }
@@ -646,5 +674,17 @@ export class ScoEditorComponent implements OnInit {
       '406': 'Tipo incorrecto',
     };
     return map[code] || 'Error';
+  }
+
+  private registrarEvento(action: string, key?: string, value?: any) {
+    this.apiLogs.unshift({
+      ts: new Date().toLocaleTimeString(),
+      action,
+      key,
+      value: value !== undefined ? String(value) : undefined,
+    });
+    if (this.apiLogs.length > 40) {
+      this.apiLogs.pop();
+    }
   }
 }

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ScormService } from '../../../services/scorm.service';
 import { ScormStateService } from '../../../services/scorm-state.service';
+import { ScormNavComponent } from '../../components/scorm-nav/scorm-nav';
 
 interface LeccionResumen {
   id: number;
@@ -21,7 +22,7 @@ interface ModuloResumen {
 
 @Component({
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ScormNavComponent],
   templateUrl: './preview.html',
   styleUrls: ['./preview.scss'],
 })
@@ -33,10 +34,14 @@ export class PreviewComponent implements OnInit {
   proyecto: any = null;
   metadata: any = null;
   modulos: ModuloResumen[] = [];
+  recursos: any[] = [];
   versionLabel = '1.2';
   scormGenerado = false;
   validacion: { valido: boolean; errores: string[]; warnings: string[] } | null = null;
   validando = false;
+  runtimeTesting = false;
+  runtimeTested = false;
+  runtimeResults: Array<{ recurso: string; estado: 'ok' | 'warn' | 'fail'; detalles: string[] }> = [];
 
   ngOnInit() {
     const projectId = this.state.getProjectId();
@@ -71,6 +76,7 @@ export class PreviewComponent implements OnInit {
 
         this.scorm.listarRecursos(manifestId).subscribe({
           next: (recursos: any[]) => {
+            this.recursos = recursos || [];
             const recursosMap: Record<number, string> = {};
             recursos.forEach((recurso) => {
               recursosMap[recurso.id_recurso] = recurso.href || recurso.identificador;
@@ -162,5 +168,129 @@ export class PreviewComponent implements OnInit {
   finalizar() {
     this.state.clearProjectData();
     this.router.navigate(['/layout']);
+  }
+
+  async ejecutarSmokeTest() {
+    if (!this.recursos.length) {
+      alert('No hay recursos disponibles para probar.');
+      return;
+    }
+    const version = this.state.getVersion() || '1.2';
+    const recursosSco = this.recursos.filter((recurso) => (recurso.scorm_type || 'sco') === 'sco');
+    if (!recursosSco.length) {
+      alert('No hay SCOs para probar.');
+      return;
+    }
+
+    this.runtimeTesting = true;
+    this.runtimeTested = false;
+    this.runtimeResults = [];
+
+    for (const recurso of recursosSco) {
+      const result = await this.probarRecursoRuntime(recurso, version);
+      this.runtimeResults.push(result);
+    }
+
+    this.runtimeTesting = false;
+    this.runtimeTested = true;
+  }
+
+  private probarRecursoRuntime(recurso: any, version: string) {
+    return new Promise<{ recurso: string; estado: 'ok' | 'warn' | 'fail'; detalles: string[] }>((resolve) => {
+      const detalles: string[] = [];
+      const href = recurso.href || recurso.nombre_fisico;
+      if (!href) {
+        resolve({ recurso: recurso.identificador || 'SCO', estado: 'fail', detalles: ['Sin href de entrada'] });
+        return;
+      }
+
+      const calls: Record<string, number> = {};
+      const register = (name: string) => {
+        calls[name] = (calls[name] || 0) + 1;
+        return 'true';
+      };
+
+      const api12 = {
+        LMSInitialize: () => register('LMSInitialize'),
+        LMSSetValue: () => register('LMSSetValue'),
+        LMSGetValue: () => register('LMSGetValue'),
+        LMSCommit: () => register('LMSCommit'),
+        LMSFinish: () => register('LMSFinish'),
+        LMSGetLastError: () => '0',
+        LMSGetErrorString: () => '',
+        LMSGetDiagnostic: () => '',
+      };
+
+      const api2004 = {
+        Initialize: () => register('Initialize'),
+        SetValue: () => register('SetValue'),
+        GetValue: () => register('GetValue'),
+        Commit: () => register('Commit'),
+        Terminate: () => register('Terminate'),
+        GetLastError: () => '0',
+        GetErrorString: () => '',
+        GetDiagnostic: () => '',
+      };
+
+      (window as any).API = api12;
+      (window as any).API_1484_11 = api2004;
+
+      const iframe = document.createElement('iframe');
+      iframe.style.width = '1px';
+      iframe.style.height = '1px';
+      iframe.style.opacity = '0';
+      iframe.style.position = 'fixed';
+      iframe.style.pointerEvents = 'none';
+      iframe.style.border = '0';
+      iframe.src = `http://localhost:3000/uploads/${encodeURI(href)}`;
+      document.body.appendChild(iframe);
+
+      const timeout = setTimeout(() => {
+        if (iframe.parentElement) {
+          iframe.parentElement.removeChild(iframe);
+        }
+        (window as any).API = null;
+        (window as any).API_1484_11 = null;
+
+        const initCalled = version === '2004_4th' ? calls['Initialize'] : calls['LMSInitialize'];
+        const commitCalled = version === '2004_4th' ? calls['Commit'] : calls['LMSCommit'];
+        const termCalled = version === '2004_4th' ? calls['Terminate'] : calls['LMSFinish'];
+        const setCalled = version === '2004_4th' ? calls['SetValue'] : calls['LMSSetValue'];
+
+        if (!initCalled) {
+          detalles.push('No se detecto Initialize/LMSInitialize.');
+        }
+        if (!setCalled) {
+          detalles.push('No se detecto SetValue/LMSSetValue.');
+        }
+        if (!commitCalled) {
+          detalles.push('No se detecto Commit/LMSCommit.');
+        }
+        if (!termCalled) {
+          detalles.push('No se detecto Terminate/LMSFinish.');
+        }
+
+        const estado = detalles.length === 0 ? 'ok' : 'warn';
+        resolve({
+          recurso: recurso.identificador || recurso.href || 'SCO',
+          estado,
+          detalles: detalles.length ? detalles : ['Runtime SCORM detectado correctamente.'],
+        });
+      }, 6000);
+
+      iframe.onerror = () => {
+        clearTimeout(timeout);
+        if (iframe.parentElement) {
+          iframe.parentElement.removeChild(iframe);
+        }
+        (window as any).API = null;
+        (window as any).API_1484_11 = null;
+        resolve({
+          recurso: recurso.identificador || 'SCO',
+          estado: 'fail',
+          detalles: ['No se pudo cargar el SCO para la prueba.'],
+        });
+      };
+    });
   }
 }

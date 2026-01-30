@@ -87,5 +87,33 @@
         allowfullscreen>
       </iframe>
     </div>
+
+    <div class="runtime-panel">
+      <div class="runtime-metrics">
+        <div class="metric">
+          <span class="label">Estado API</span>
+          <span class="value">{{ apiReady ? 'Activo' : 'Sin API' }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">Commits enviados</span>
+          <span class="value">{{ commits }}</span>
+        </div>
+        <div class="metric">
+          <span class="label">Ultimo error</span>
+          <span class="value">{{ lastError }}</span>
+        </div>
+      </div>
+      <div class="runtime-log">
+        <h4>Log SCORM</h4>
+        <div class="log-list">
+          <div class="log-item" *ngFor="let log of apiLogs">
+            <span class="log-time">{{ log.ts }}</span>
+            <span class="log-action">{{ log.action }}</span>
+            <span class="log-key" *ngIf="log.key">{{ log.key }}</span>
+            <span class="log-value" *ngIf="log.value">{{ log.value }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </div>

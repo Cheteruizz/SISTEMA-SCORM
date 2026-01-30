@@ -1,8 +1,7 @@
-<div class="validation-shell">
-  <button class="back-link" (click)="volver()">
-    &#8592; Volver
-  </button>
+<div class="page-shell">
+  <app-scorm-nav [showStepper]="true" activeStep="validation"></app-scorm-nav>
 
+  <div class="validation-shell">
   <img src="logoSCORM.png" alt="Logo SCORM" class="logo-img">
 
   <h1>Configuraci&#243;n del est&#225;ndar SCORM</h1>
@@ -26,7 +25,7 @@
     </article>
 
     <article class="scorm-card">
-      <h2>SCORM 2004</h2>
+      <h2>SCORM 2004 (4th Edition)</h2>
       <p>
         Incluye todas las funciones de SCORM 1.2 (tracking de progreso, puntuaciones,
         estado, tiempo y comunicaci&#243;n LMS), y a&#241;ade mejoras avanzadas.
@@ -38,7 +37,8 @@
       <p>
         Es ideal para cursos complejos, aunque no todos los LMS soportan todas sus ediciones.
       </p>
-      <button class="btn-solid" (click)="seleccionarVersion('2004')">Elegir SCORM 2004 y continuar</button>
+      <button class="btn-solid" (click)="seleccionarVersion('2004')">Elegir SCORM 2004 4th y continuar</button>
     </article>
+  </div>
   </div>
 </div>

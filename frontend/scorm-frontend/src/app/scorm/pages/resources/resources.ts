@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router } from '@angular/router';
 import { ScormService } from '../../../services/scorm.service';
 import { ScormStateService } from '../../../services/scorm-state.service';
+import { ScormNavComponent } from '../../components/scorm-nav/scorm-nav';
 
 interface LeccionOption {
   id_leccion: number;
@@ -14,7 +15,7 @@ interface LeccionOption {
 @Component({
   selector: 'app-resources',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ScormNavComponent],
   templateUrl: './resources.html',
   styleUrls: ['./resources.scss'],
 })
@@ -134,6 +135,7 @@ export class ResourcesComponent implements OnInit {
   }
 
   irAImportar() {
+    this.state.setImportReturn('/resources');
     this.router.navigate(['/importar']);
   }
 

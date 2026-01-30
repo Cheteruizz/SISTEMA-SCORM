@@ -27,7 +27,7 @@ p {
 
 .import-card {
   width: 100%;
-  max-width: 820px;
+  max-width: 920px;
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid #d6e6df;
   border-radius: 24px;
@@ -40,6 +40,11 @@ p {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.import-form.disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .form-row {
@@ -69,6 +74,119 @@ textarea {
   border: none;
   padding: 12px 40px;
   border-radius: 30px;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--color-principal);
+  color: var(--color-principal);
+  padding: 10px 26px;
+  border-radius: 999px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.import-tabs {
+  display: inline-flex;
+  gap: 10px;
+  background: rgba(11, 46, 78, 0.08);
+  padding: 6px;
+  border-radius: 999px;
+}
+
+.tab {
+  border: none;
+  background: transparent;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--color-principal);
+  cursor: pointer;
+  margin: 0;
+}
+
+.tab.active {
+  background: var(--color-principal);
+  color: #fff;
+}
+
+.import-status {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.status-pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(11, 46, 78, 0.08);
+  color: var(--color-principal);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.status-pill.warn {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+}
+
+.import-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.import-header h2 {
+  margin: 0 0 6px;
+  text-align: left;
+}
+
+.helper {
+  margin: 0;
+  color: #4a4a4a;
+  text-align: left;
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 211, 72, 0.12);
+  color: #0f766e;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.inline-warning {
+  background: rgba(234, 88, 12, 0.12);
+  color: #9a3412;
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.import-next {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.next-hint {
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.next-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .estado {
@@ -116,7 +234,7 @@ textarea {
 
 .back-link {
   position: absolute;
-  top: 20px;
+  top: 110px;
   left: 20px;
   background: none;
   border: none;

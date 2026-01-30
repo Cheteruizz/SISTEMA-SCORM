@@ -1,8 +1,7 @@
-<div class="preview-shell">
-  <button class="back-link" (click)="volver()">
-    &#8592; Volver
-  </button>
+<div class="page-shell">
+  <app-scorm-nav [showStepper]="true" activeStep="preview"></app-scorm-nav>
 
+  <div class="preview-shell">
   <img src="logoSCORM.png" alt="Logo SCORM" class="logo-img">
 
   <h1>Vista previa del Paquete SCORM</h1>
@@ -70,6 +69,25 @@
     </div>
   </section>
 
+  <section class="preview-section">
+    <h2>Prueba de runtime SCORM</h2>
+    <p class="helper-text">
+      Ejecuta una prueba rÃ¡pida para detectar si los SCOs estÃ¡n llamando a la API SCORM.
+    </p>
+    <button class="btn-outline" (click)="ejecutarSmokeTest()" [disabled]="runtimeTesting">
+      {{ runtimeTesting ? 'Ejecutando pruebas...' : 'Ejecutar smoke test' }}
+    </button>
+
+    <div class="runtime-results" *ngIf="runtimeTested">
+      <div class="runtime-card" *ngFor="let result of runtimeResults" [class.ok]="result.estado === 'ok'" [class.warn]="result.estado === 'warn'" [class.fail]="result.estado === 'fail'">
+        <h4>{{ result.recurso }}</h4>
+        <ul>
+          <li *ngFor="let detalle of result.detalles">{{ detalle }}</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <section class="preview-section" *ngIf="validacion">
     <h2>Validacion del paquete</h2>
     <p class="estado-validacion" [class.ok]="validacion.valido" [class.bad]="!validacion.valido">
@@ -89,12 +107,13 @@
     </div>
   </section>
 
-  <div class="acciones-finales">
+    <div class="acciones-finales">
     <button class="btn-solid" (click)="generarScorm()" [disabled]="validando">
       {{ validando ? 'Validando...' : 'Generar SCORM' }}
     </button>
     <button class="btn-solid" *ngIf="scormGenerado" (click)="finalizar()">
       Finalizar y crear otro
     </button>
+  </div>
   </div>
 </div>

@@ -1,10 +1,7 @@
-<div class="contenedor-organizacion">
-  <div class="barra-superior">
-    <button class="boton-volver" (click)="irAtras()">
-      &#8592; Volver
-    </button>
-  </div>
+<div class="page-shell">
+  <app-scorm-nav [showStepper]="true" activeStep="organizations"></app-scorm-nav>
 
+  <div class="contenedor-organizacion">
   <div class="contenido-central">
     <div class="cabecera-seccion">
       <img src="logoSCORM.png" alt="Logo SCORM" class="icono-principal">
@@ -114,6 +111,7 @@
       <div class="acciones-paso">
         <button class="btn-continuar" (click)="irARecursos()">Continuar recursos</button>
       </div>
+    </div>
     </div>
   </div>
 </div>

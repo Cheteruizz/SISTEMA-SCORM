@@ -4,13 +4,14 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router } from '@angular/router';
 import { ScormService } from '../../../services/scorm.service';
 import { ScormStateService } from '../../../services/scorm-state.service';
+import { ScormNavComponent } from '../../components/scorm-nav/scorm-nav';
 
 type Paso = 'explicacion' | 'infoBasica' | 'autoria';
 
 @Component({
   selector: 'app-metadata',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ScormNavComponent],
   templateUrl: './metadata.html',
   styleUrls: ['./metadata.scss'],
 })

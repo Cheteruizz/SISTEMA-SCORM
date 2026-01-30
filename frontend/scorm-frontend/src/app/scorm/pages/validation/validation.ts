@@ -2,11 +2,13 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ScormStateService } from '../../../services/scorm-state.service';
 import { ScormService } from '../../../services/scorm.service';
+import { ScormNavComponent } from '../../components/scorm-nav/scorm-nav';
 
 @Component({
   standalone: true,
   templateUrl: './validation.html',
-  styleUrls: ['./validation.scss']
+  styleUrls: ['./validation.scss'],
+  imports: [ScormNavComponent]
 })
 export class ValidationComponent {
   private router = inject(Router);

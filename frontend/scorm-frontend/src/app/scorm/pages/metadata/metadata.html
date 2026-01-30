@@ -1,111 +1,109 @@
-<div class="contenedor-metadatos">
-  <div class="header-nav">
-    <button class="btn-volver-atras" (click)="volver()">
-      <span class="flecha-azul">&#8592;</span> Volver
-    </button>
-  </div>
+<div class="page-shell">
+  <app-scorm-nav [showStepper]="true" activeStep="metadata"></app-scorm-nav>
 
-  <div class="contenido-central">
-    <div class="cabecera-comun">
-      <img src="logoSCORM.png" alt="Logo SCORM" class="icono-principal">
-      <h1 class="titulo-principal">Metadatos del Paquete</h1>
-    </div>
-
-    @if (pasoActual === 'explicacion') {
-      <div class="paso-contenido paso-explicacion">
-        <p class="subtitulo-principal">Define la informaci&#243;n descriptiva de tu paquete SCORM.</p>
-
-        <div class="caja-explicativa">
-          <h2>&#191;Qu&#233; son los metadatos SCORM?</h2>
-          <p>
-            Los metadatos describen tu paquete SCORM e incluyen t&#237;tulo, descripci&#243;n, autor,
-            idioma y otros datos que permiten que plataformas como Moodle, Canvas o Blackboard
-            organicen y encuentren tu contenido f&#225;cilmente.
-          </p>
-        </div>
-
-        <div class="acciones-paso">
-          <button class="btn-continuar" (click)="cambiarPaso('infoBasica')">
-            Comenzar configuraci&#243;n
-          </button>
-        </div>
+  <div class="contenedor-metadatos">
+    <div class="contenido-central">
+      <div class="cabecera-comun">
+        <img src="logoSCORM.png" alt="Logo SCORM" class="icono-principal">
+        <h1 class="titulo-principal">Metadatos del Paquete</h1>
       </div>
-    }
 
-    <form [formGroup]="metadataForm" (ngSubmit)="onSubmitMetadata()">
-      @if (pasoActual === 'infoBasica') {
-        <div class="paso-contenido">
-          <div class="encabezado-seccion">
-            <h2 class="subtitulo-seccion">Informaci&#243;n b&#225;sica del curso</h2>
-            <p class="descripcion-seccion">Rellena los datos principales que identificar&#225;n tu curso.</p>
-          </div>
+      @if (pasoActual === 'explicacion') {
+        <div class="paso-contenido paso-explicacion">
+          <p class="subtitulo-principal">Define la informaci&#243;n descriptiva de tu paquete SCORM.</p>
 
-          <div class="grid-formulario">
-            <div class="campo-formulario titulo-full">
-              <label>T&#237;tulo del curso:</label>
-              <input type="text" formControlName="titulo" placeholder="Ej: Matem&#225;ticas 1">
-              @if (metadataForm.get('titulo')?.invalid && metadataForm.get('titulo')?.touched) {
-                <span class="error-mensaje">El t&#237;tulo es obligatorio</span>
-              }
-            </div>
-
-            <div class="campo-formulario descripcion-full">
-              <label>Descripci&#243;n del curso:</label>
-              <textarea rows="4" formControlName="descripcion" placeholder="Escribe una breve descripci&#243;n..."></textarea>
-            </div>
-
-            <div class="campo-formulario campo-idioma">
-              <label>Idioma:</label>
-              <div class="select-wrapper">
-                <select formControlName="idioma">
-                  <option value="es">Espa&#241;ol</option>
-                  <option value="en">Ingl&#233;s</option>
-                  <option value="fr">Franc&#233;s</option>
-                </select>
-                <span class="flecha-abajo">&#9660;</span>
-              </div>
-            </div>
+          <div class="caja-explicativa">
+            <h2>&#191;Qu&#233; son los metadatos SCORM?</h2>
+            <p>
+              Los metadatos describen tu paquete SCORM e incluyen t&#237;tulo, descripci&#243;n, autor,
+              idioma y otros datos que permiten que plataformas como Moodle, Canvas o Blackboard
+              organicen y encuentren tu contenido f&#225;cilmente.
+            </p>
           </div>
 
           <div class="acciones-paso">
-            <button type="button" class="btn-continuar" (click)="cambiarPaso('autoria')">Siguiente paso</button>
-          </div>
-        </div>
-      }
-
-      @if (pasoActual === 'autoria') {
-        <div class="paso-contenido">
-          <div class="encabezado-seccion">
-            <h2 class="subtitulo-seccion">Informaci&#243;n de autor&#237;a</h2>
-            <p class="descripcion-seccion">Indica qui&#233;n es responsable del contenido educativo.</p>
-          </div>
-
-          <div class="grid-formulario tres-columnas">
-            <div class="campo-formulario">
-              <label>Autor principal:</label>
-              <input type="text" formControlName="autor">
-            </div>
-
-            <div class="campo-formulario">
-              <label>Organizaci&#243;n:</label>
-              <input type="text" formControlName="organizacion">
-            </div>
-
-            <div class="campo-formulario">
-              <label>Entidad publicadora:</label>
-              <input type="text" formControlName="entidadPublicadora">
-              <span class="texto-ayuda-input">Entidad que publica o patrocina este contenido</span>
-            </div>
-          </div>
-
-          <div class="acciones-paso final">
-            <button type="button" class="btn-secundario" (click)="cambiarPaso('infoBasica')">Atr&#225;s</button>
-            <button type="submit" class="btn-continuar btn-final">
-              Continuar a la configuraci&#243;n SCORM
+            <button class="btn-continuar" (click)="cambiarPaso('infoBasica')">
+              Comenzar configuraci&#243;n
             </button>
           </div>
         </div>
       }
-    </form>
+
+      <form [formGroup]="metadataForm" (ngSubmit)="onSubmitMetadata()">
+        @if (pasoActual === 'infoBasica') {
+          <div class="paso-contenido">
+            <div class="encabezado-seccion">
+              <h2 class="subtitulo-seccion">Informaci&#243;n b&#225;sica del curso</h2>
+              <p class="descripcion-seccion">Rellena los datos principales que identificar&#225;n tu curso.</p>
+            </div>
+
+            <div class="grid-formulario">
+              <div class="campo-formulario titulo-full">
+                <label>T&#237;tulo del curso:</label>
+                <input type="text" formControlName="titulo" placeholder="Ej: Matem&#225;ticas 1">
+                @if (metadataForm.get('titulo')?.invalid && metadataForm.get('titulo')?.touched) {
+                  <span class="error-mensaje">El t&#237;tulo es obligatorio</span>
+                }
+              </div>
+
+              <div class="campo-formulario descripcion-full">
+                <label>Descripci&#243;n del curso:</label>
+                <textarea rows="4" formControlName="descripcion" placeholder="Escribe una breve descripci&#243;n..."></textarea>
+              </div>
+
+              <div class="campo-formulario campo-idioma">
+                <label>Idioma:</label>
+                <div class="select-wrapper">
+                  <select formControlName="idioma">
+                    <option value="es">Espa&#241;ol</option>
+                    <option value="en">Ingl&#233;s</option>
+                    <option value="fr">Franc&#233;s</option>
+                  </select>
+                  <span class="flecha-abajo">&#9660;</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="acciones-paso">
+              <button type="button" class="btn-continuar" (click)="cambiarPaso('autoria')">Siguiente paso</button>
+            </div>
+          </div>
+        }
+
+        @if (pasoActual === 'autoria') {
+          <div class="paso-contenido">
+            <div class="encabezado-seccion">
+              <h2 class="subtitulo-seccion">Informaci&#243;n de autor&#237;a</h2>
+              <p class="descripcion-seccion">Indica qui&#233;n es responsable del contenido educativo.</p>
+            </div>
+
+            <div class="grid-formulario tres-columnas">
+              <div class="campo-formulario">
+                <label>Autor principal:</label>
+                <input type="text" formControlName="autor">
+              </div>
+
+              <div class="campo-formulario">
+                <label>Organizaci&#243;n:</label>
+                <input type="text" formControlName="organizacion">
+              </div>
+
+              <div class="campo-formulario">
+                <label>Entidad publicadora:</label>
+                <input type="text" formControlName="entidadPublicadora">
+                <span class="texto-ayuda-input">Entidad que publica o patrocina este contenido</span>
+              </div>
+            </div>
+
+            <div class="acciones-paso final">
+              <button type="button" class="btn-secundario" (click)="cambiarPaso('infoBasica')">Atr&#225;s</button>
+              <button type="submit" class="btn-continuar btn-final">
+                Continuar a la configuraci&#243;n SCORM
+              </button>
+            </div>
+          </div>
+        }
+      </form>
+    </div>
   </div>
 </div>

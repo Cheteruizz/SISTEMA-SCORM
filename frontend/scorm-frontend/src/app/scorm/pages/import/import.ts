@@ -4,10 +4,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { ScormService } from '../../../services/scorm.service';
 import { ScormStateService } from '../../../services/scorm-state.service';
+import { ScormNavComponent } from '../../components/scorm-nav/scorm-nav';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ScormNavComponent],
   templateUrl: './import.html',
   styleUrls: ['./import.scss'],
 })
@@ -16,6 +17,8 @@ export class ImportComponent {
   private scorm = inject(ScormService);
   private state = inject(ScormStateService);
   private router = inject(Router);
+
+  activeTab: 'manifest' | 'zip' = this.state.getProjectId() ? 'manifest' : 'zip';
 
   form: FormGroup = this.fb.group({
     manifest: [null, Validators.required],
@@ -36,6 +39,29 @@ export class ImportComponent {
   cargando = false;
   cargandoZip = false;
 
+  get hasProject() {
+    return Boolean(this.state.getProjectId());
+  }
+
+  get hasUser() {
+    return Boolean(this.state.getUserId());
+  }
+
+  get canEditZip() {
+    return Boolean(
+      this.resultadoZip &&
+        this.resultadoZip.valido &&
+        !this.zipForm.value.zipDryRun &&
+        this.resultadoZip.id_proyecto
+    );
+  }
+
+  setTab(tab: 'manifest' | 'zip') {
+    this.activeTab = tab;
+    this.resultado = null;
+    this.resultadoZip = null;
+  }
+
   onFileSelected(event: any) {
     const file: File = event.target.files?.[0];
     if (!file) return;
@@ -52,6 +78,7 @@ export class ImportComponent {
     const projectId = this.state.getProjectId();
     if (!projectId) {
       alert('No hay proyecto activo.');
+      this.router.navigate(['/layout']);
       return;
     }
 
@@ -71,6 +98,7 @@ export class ImportComponent {
       .subscribe({
         next: (resp) => {
           this.resultado = resp;
+          this.resultadoZip = null;
           this.cargando = false;
           if (!resp.valido && this.form.value.dryRun) {
             alert('Hay errores en el manifest. Revisa la lista.');
@@ -88,6 +116,7 @@ export class ImportComponent {
     const crearProyecto = Boolean(this.zipForm.value.crearProyecto);
     if (!projectId && !crearProyecto) {
       alert('No hay proyecto activo.');
+      this.router.navigate(['/layout']);
       return;
     }
     if (crearProyecto && !this.state.getUserId()) {
@@ -115,6 +144,7 @@ export class ImportComponent {
       .subscribe({
         next: (resp) => {
           this.resultadoZip = resp;
+          this.resultado = null;
           this.cargandoZip = false;
           if (!resp.valido && this.zipForm.value.zipDryRun) {
             alert('Hay errores en el ZIP. Revisa la lista.');
@@ -124,6 +154,7 @@ export class ImportComponent {
             this.state.setManifestId(resp.id_manifest);
             this.state.setOrganizationId(resp.id_organizacion_principal);
             this.state.setVersion('1.2');
+            this.state.clearImportReturn();
             this.router.navigate(['/organizations']);
           }
         },
@@ -135,7 +166,27 @@ export class ImportComponent {
   }
 
   volver() {
-    const projectId = this.state.getProjectId();
-    this.router.navigate([projectId ? '/resources' : '/layout']);
+    const returnPath = this.state.getImportReturn();
+    if (returnPath) {
+      this.state.clearImportReturn();
+      this.router.navigate([returnPath]);
+      return;
+    }
+    this.router.navigate(['/layout']);
+  }
+
+  irAEditarZip() {
+    if (!this.canEditZip) return;
+    this.router.navigate(['/organizations']);
+  }
+
+  irARecursosZip() {
+    if (!this.canEditZip) return;
+    this.router.navigate(['/resources']);
+  }
+
+  irAMetadataZip() {
+    if (!this.canEditZip) return;
+    this.router.navigate(['/metadata']);
   }
 }

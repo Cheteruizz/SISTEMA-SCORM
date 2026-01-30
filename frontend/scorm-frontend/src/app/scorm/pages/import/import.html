@@ -1,18 +1,47 @@
-<div class="import-shell">
-  <button class="back-link" (click)="volver()">
-    &#8592; Volver
-  </button>
+<div class="page-shell">
+  <app-scorm-nav></app-scorm-nav>
 
+  <div class="import-shell">
   <img src="logoSCORM.png" alt="Logo SCORM" class="logo-img">
 
-  <h1>Importar imsmanifest.xml</h1>
-  <p>Sube un manifest y enlaza los recursos con archivos ya cargados en el proyecto.</p>
+  <h1>Centro de importaciones</h1>
+  <p>Trae un paquete completo o solo el manifest. Te guiamos para evitar errores de ruta.</p>
 
-  <section class="import-card">
-    <form [formGroup]="form" class="import-form">
+  <div class="import-tabs">
+    <button class="tab" [class.active]="activeTab === 'manifest'" (click)="setTab('manifest')">
+      Importar manifest
+    </button>
+    <button class="tab" [class.active]="activeTab === 'zip'" (click)="setTab('zip')">
+      Importar ZIP SCORM
+    </button>
+  </div>
+
+  <div class="import-status">
+    <div class="status-pill" [class.warn]="!hasProject">
+      {{ hasProject ? 'Proyecto activo' : 'Sin proyecto activo' }}
+    </div>
+    <div class="status-pill" [class.warn]="!hasUser">
+      {{ hasUser ? 'Usuario activo' : 'Sin usuario activo' }}
+    </div>
+  </div>
+
+  <section class="import-card" *ngIf="activeTab === 'manifest'">
+    <div class="import-header">
+      <div>
+        <h2>Importar imsmanifest.xml</h2>
+        <p class="helper">Usa esta opción si ya cargaste los archivos en Recursos.</p>
+      </div>
+      <span class="badge">Proyecto requerido</span>
+    </div>
+
+    <div class="inline-warning" *ngIf="!hasProject">
+      Necesitas un proyecto activo para importar el manifest. Vuelve al panel y crea uno nuevo.
+    </div>
+
+    <form [formGroup]="form" class="import-form" [class.disabled]="!hasProject">
       <div class="form-row">
         <label>Archivo imsmanifest.xml</label>
-        <input type="file" accept=".xml" (change)="onFileSelected($event)">
+        <input type="file" accept=".xml" (change)="onFileSelected($event)" [disabled]="!hasProject">
       </div>
 
       <div class="form-row">
@@ -20,25 +49,33 @@
         <textarea
           formControlName="archivoMap"
           rows="4"
-          placeholder='{"content/index.html": 12, "content/style.css": 13}'></textarea>
+          placeholder='{"content/index.html": 12, "content/style.css": 13}'
+          [disabled]="!hasProject"></textarea>
       </div>
 
       <div class="form-row">
         <label class="toggle">
-          <input type="checkbox" formControlName="dryRun">
+          <input type="checkbox" formControlName="dryRun" [disabled]="!hasProject">
           Validar sin crear registros (dry run)
         </label>
       </div>
 
-      <button class="btn-solid" type="button" (click)="importar()" [disabled]="cargando">
+      <button class="btn-solid" type="button" (click)="importar()" [disabled]="cargando || !hasProject">
         {{ cargando ? 'Importando...' : 'Importar manifest' }}
       </button>
     </form>
   </section>
 
-  <section class="import-card">
+  <section class="import-card" *ngIf="activeTab === 'zip'">
+    <div class="import-header">
+      <div>
+        <h2>Importar ZIP SCORM</h2>
+        <p class="helper">Trae un paquete completo y crea o actualiza un proyecto.</p>
+      </div>
+      <span class="badge">Recomendado</span>
+    </div>
+
     <form [formGroup]="zipForm" class="import-form">
-      <h2>Importar ZIP SCORM</h2>
       <div class="form-row">
         <label>Archivo ZIP</label>
         <input type="file" accept=".zip" (change)="onZipSelected($event)">
@@ -75,7 +112,7 @@
   </section>
 
   <section class="import-card" *ngIf="resultado">
-    <h2>Resultado</h2>
+    <h2>Resultado del manifest</h2>
     <p class="estado" [class.ok]="resultado.valido" [class.bad]="!resultado.valido">
       {{ resultado.valido ? 'Manifest valido' : 'Errores detectados' }}
     </p>
@@ -110,7 +147,7 @@
   </section>
 
   <section class="import-card" *ngIf="resultadoZip">
-    <h2>Resultado ZIP</h2>
+    <h2>Resultado del ZIP</h2>
     <p class="estado" [class.ok]="resultadoZip.valido" [class.bad]="!resultadoZip.valido">
       {{ resultadoZip.valido ? 'ZIP valido' : 'Errores detectados' }}
     </p>
@@ -142,5 +179,17 @@
         </div>
       </div>
     </div>
+
+    <div class="import-next">
+      <div class="next-hint" *ngIf="resultadoZip.valido && zipForm.value.zipDryRun">
+        Para editar el contenido, desactiva "dry run" y vuelve a importar el ZIP.
+      </div>
+      <div class="next-actions" *ngIf="canEditZip">
+        <button class="btn-outline" type="button" (click)="irAMetadataZip()">Editar metadatos</button>
+        <button class="btn-outline" type="button" (click)="irARecursosZip()">Gestionar recursos</button>
+        <button class="btn-solid" type="button" (click)="irAEditarZip()">Editar estructura</button>
+      </div>
+    </div>
   </section>
+  </div>
 </div>

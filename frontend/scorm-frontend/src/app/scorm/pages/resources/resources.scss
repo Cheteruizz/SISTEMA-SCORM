@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 // Variables de colores basadas en tu imagen
 $color-fondo-inicio: #9beebd; // Verde agua claro
 $color-fondo-fin: #ffffff;    // Blanco
@@ -165,7 +167,7 @@ $dorado: #d4af37;             // Para la flecha
   gap: 10px;
 
   &:hover {
-    background-color: lighten($azul-oscuro, 10%);
+    background-color: color.adjust($azul-oscuro, $lightness: 10%);
     transform: scale(1.05);
   }
 }

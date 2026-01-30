@@ -1,0 +1,45 @@
+<header class="scorm-nav">
+  <div class="nav-bar">
+    <a class="brand" routerLink="/layout">
+      <img src="logoSCORM.png" alt="SCORM">
+      <div class="brand-text">
+        <span class="brand-title">SCORM Studio</span>
+        <span class="brand-subtitle">Administrador de paquetes</span>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      @for (link of primaryLinks; track link.path) {
+        <a
+          [routerLink]="link.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: link.exact ?? false }"
+          (click)="link.path === '/importar' ? onImportClick() : null">
+          {{ link.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="nav-actions">
+      <button class="ghost" type="button" (click)="onExit()">Salir</button>
+    </div>
+  </div>
+
+  @if (showStepper) {
+    <div class="nav-stepper">
+      <span class="stepper-label">Flujo de creacion</span>
+      <div class="stepper-trail">
+        @for (step of steps; track step.key) {
+          <a
+            class="stepper-item"
+            [class.active]="activeStep === step.key"
+            [class.done]="isStepDone(step.key)"
+            [routerLink]="step.path">
+            <span class="step-index">{{ step.index }}</span>
+            <span class="step-label">{{ step.label }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  }
+</header>

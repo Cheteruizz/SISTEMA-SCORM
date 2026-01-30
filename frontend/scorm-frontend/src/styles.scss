@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
+
 /* You can add global styles to this file, and also import other style files */
 /* =========================================
    VARIABLES (Tus colores maestros)
@@ -9,6 +11,8 @@
   --verde-claro: #a8dec9;    
   /* Verde intenso del check */
   --verde-check: #00d348;    
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
 }
 
 /* =========================================
@@ -17,21 +21,30 @@
 html, body {
   height: 100%;
   margin: 0;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-body);
 }
 
 body {
-  /* El gradiente de izquierda (verde) a derecha (blanco) */
-  background: linear-gradient(135deg, var(--verde-claro) 27%, #ffffff 60%);
+  /* Fondo con mas profundidad */
+  background:
+    radial-gradient(circle at 12% 18%, rgba(168, 222, 201, 0.75) 0%, rgba(168, 222, 201, 0) 45%),
+    radial-gradient(circle at 88% 16%, rgba(111, 183, 214, 0.45) 0%, rgba(111, 183, 214, 0) 40%),
+    linear-gradient(135deg, var(--verde-claro) 20%, #ffffff 62%);
   background-repeat: no-repeat;
   background-attachment: fixed; /* Para que el fondo no se mueva al hacer scroll */
   
-  /* Centrar todo el contenido vertical y horizontalmente por defecto */
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
   color: var(--color-principal);
+}
+
+app-root {
+  width: 100%;
+  display: block;
+}
+
+.page-shell {
+  width: 100%;
+  min-height: 100vh;
 }
 
 /* =========================================
@@ -42,8 +55,8 @@ input[type="password"],
 input[type="email"] {
   display: block;
   width: 100%;
-  max-width: 350px; /* Ancho máximo para que se vea elegante */
-  margin: 15px auto; /* Centrado y separado */
+  max-width: 520px;
+  margin: 12px 0;
   padding: 12px 20px;
   
   /* ESTILO VISUAL */
@@ -54,8 +67,9 @@ input[type="email"] {
   /* TEXTO INTERNO */
   font-size: 1.1rem;
   color: var(--color-principal);
-  text-align: center; /* Texto centrado como en la imagen */
+  text-align: left;
   outline: none; /* Quitar borde azul de Chrome al hacer clic */
+  font-family: var(--font-body);
 }
 
 /* Efecto al hacer clic en el input */
@@ -77,7 +91,8 @@ button {
   margin-top: 20px;
   transition: transform 0.1s;
   display: block;
-  margin: 20px auto;
+  margin: 20px 0;
+  font-family: var(--font-body);
 }
 
 button:active {
@@ -101,6 +116,7 @@ h1, h2, h3 {
   color: var(--color-principal);
   text-align: center;
   margin-bottom: 10px;
+  font-family: var(--font-display);
 }
 
 p {
@@ -116,8 +132,10 @@ a {
 }
 
 img {
-    height: 255px;
-    width: 255px;
-    display: block;
-    margin: auto;
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
+
+
+

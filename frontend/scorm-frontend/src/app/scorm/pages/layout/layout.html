@@ -1,27 +1,32 @@
-<div class="layout-shell">
-  <button class="back-link" (click)="volver()">
-    &#8592; Volver
-  </button>
+<div class="page-shell">
+  <app-scorm-nav></app-scorm-nav>
 
-  <img src="logoSCORM.png" alt="Logotipo SCORM" class="logo-img">
-
-  <h1>Panel Principal</h1>
-  <p>Gestiona tus paquetes SCORM de forma sencilla y profesional.</p>
-
-  <div class="panel-grid">
-    <div class="panel-card">
-      <button class="btn-outline" (click)="crearPaquete()">Crear nuevo paquete</button>
-      <span>Inicia un proyecto desde cero</span>
+  <div class="layout-shell">
+    <div class="panel-hero">
+      <img src="logoSCORM.png" alt="Logotipo de Manifestum" class="logo-img">
+      <span class="hero-badge">Manifestum</span>
+      <h1>Panel principal</h1>
+      <p>Gestiona tus paquetes SCORM de forma sencilla y profesional.</p>
     </div>
 
-    <div class="panel-card">
-      <button class="btn-outline" (click)="historial()">Historial y Borradores</button>
-      <span>Gestiona y retoma tus paquetes creados o en desarrollo.</span>
-    </div>
+    <div class="panel-grid">
+      <div class="panel-card">
+        <h3>Crear paquete</h3>
+        <span>Inicia un proyecto SCORM desde cero.</span>
+        <button class="btn-primary" (click)="crearPaquete()">Crear nuevo paquete</button>
+      </div>
 
-    <div class="panel-card">
-      <button class="btn-outline" (click)="importarProyecto()">Importar proyecto (ZIP)</button>
-      <span>Crea un proyecto nuevo a partir de un paquete SCORM.</span>
+      <div class="panel-card">
+        <h3>Historial</h3>
+        <span>Retoma paquetes creados o en desarrollo.</span>
+        <button class="btn-ghost" (click)="historial()">Historial y borradores</button>
+      </div>
+
+      <div class="panel-card">
+        <h3>Importar</h3>
+        <span>Crea un proyecto desde un ZIP SCORM.</span>
+        <button class="btn-ghost" (click)="importarProyecto()">Importar proyecto (ZIP)</button>
+      </div>
     </div>
   </div>
 </div>

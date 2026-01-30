@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -8,5 +9,16 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.scss'
 })
 export class App {
+  private readonly location = inject(Location);
+  private readonly router = inject(Router);
   protected readonly title = signal('scorm-frontend');
+
+  get isHome(): boolean {
+    const url = this.router.url || '';
+    return url === '/' || url.startsWith('/home');
+  }
+
+  goBack() {
+    this.location.back();
+  }
 }

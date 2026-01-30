@@ -13,6 +13,10 @@ const Archivo = require('../models/archivo.model');
 const Proyecto = require('../models/proyecto.model');
 const ProyectoMetadata = require('../models/proyecto_metadata.model');
 const { normalizeRelativePath } = require('../services/scorm12');
+const {
+  validateManifestImportData,
+  detectScormVersion,
+} = require('../services/scorm_manifest_validator');
 
 const parser = new XMLParser({
   ignoreAttributes: false,
@@ -81,6 +85,10 @@ const parseManifest = (xml) => {
     return { errors: ['No se encontro nodo manifest en el XML'], data: null };
   }
 
+  const metadataNode = manifestNode.metadata || {};
+  const schemaValue = getText(metadataNode.schema);
+  const schemaversionValue = getText(metadataNode.schemaversion);
+
   const manifest = {
     identificador: manifestNode.identifier || manifestNode.id || 'MANIFEST',
     version: manifestNode.version || null,
@@ -107,7 +115,15 @@ const parseManifest = (xml) => {
 
   return {
     errors: [],
-    data: { manifest, organizations, resources },
+    data: {
+      manifest,
+      organizations,
+      resources,
+      metadata: {
+        schema: schemaValue,
+        schemaversion: schemaversionValue,
+      },
+    },
   };
 };
 
@@ -238,6 +254,15 @@ const importarManifest = async (req, res) => {
       return res.status(400).json({ mensaje: 'XML invalido', errores: parsed.errors });
     }
 
+    const manifestValidation = validateManifestImportData(parsed.data);
+    if (manifestValidation.errors.length) {
+      return res.status(400).json({
+        mensaje: 'Manifest invalido',
+        errores: manifestValidation.errors,
+        warnings: manifestValidation.warnings,
+      });
+    }
+
     const { manifest, organizations, resources } = parsed.data;
     const archivos = await Archivo.obtenerTodos({ id_proyecto });
     const archivoIndex = buildArchivoIndex(archivos);
@@ -274,6 +299,7 @@ const importarManifest = async (req, res) => {
       return res.json({
         valido: errores.length === 0,
         errores,
+        warnings: manifestValidation.warnings,
         data: { manifest, organizations: organizations.map((o) => ({
           identificador: o.identificador,
           titulo: o.titulo,
@@ -330,6 +356,10 @@ const importarZip = async (req, res) => {
       const entryPath = String(entry.path || '').replace(/\\/g, '/');
       if (entry.type === 'Directory') return;
       if (path.basename(entryPath).toLowerCase() === 'imsmanifest.xml') {
+        if (entryPath.toLowerCase() !== 'imsmanifest.xml') {
+          errores.push('imsmanifest.xml debe estar en la raiz del ZIP');
+          return;
+        }
         manifestEntry = entry;
         return;
       }
@@ -373,6 +403,15 @@ const importarZip = async (req, res) => {
       return res.status(400).json({ valido: false, errores: parsed.errors });
     }
 
+    const validation = validateManifestImportData(parsed.data);
+    if (validation.errors.length) {
+      return res.status(400).json({
+        valido: false,
+        errores: validation.errors,
+        warnings: validation.warnings,
+      });
+    }
+
     if (crearProyecto && !dryRun) {
       const titulo =
         req.body?.titulo ||
@@ -380,7 +419,8 @@ const importarZip = async (req, res) => {
         parsed.data.manifest?.identificador ||
         'Proyecto importado';
       const descripcion = req.body?.descripcion || null;
-      const version_scorm = req.body?.version_scorm || '1.2';
+      const detectedVersion = detectScormVersion(parsed.data.metadata) || null;
+      const version_scorm = req.body?.version_scorm || detectedVersion || '1.2';
 
       id_proyecto = await Proyecto.crear({
         id_usuario,
@@ -490,6 +530,7 @@ const importarZip = async (req, res) => {
             es_principal: o.es_principal,
           })),
           resources: recursos,
+          metadata: parsed.data.metadata,
         },
       });
     }

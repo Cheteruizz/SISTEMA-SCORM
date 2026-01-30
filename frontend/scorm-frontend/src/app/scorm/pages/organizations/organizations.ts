@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ScormService } from '../../../services/scorm.service';
 import { ScormStateService } from '../../../services/scorm-state.service';
+import { ScormNavComponent } from '../../components/scorm-nav/scorm-nav';
 
 interface Leccion {
   id_leccion: number;
@@ -25,7 +26,7 @@ interface Modulo {
 @Component({
   selector: 'app-modulos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ScormNavComponent],
   templateUrl: './organizations.html',
   styleUrls: ['./organizations.scss'],
 })

@@ -95,11 +95,12 @@ const buildResourcesXml = (recursos, archivos = [], options = {}) => {
       const archivoHref = href || escapeXml(prefixContent ? withContentPrefix(archivoBase) : archivoBase);
       const files = new Set();
 
-      if (hrefRaw) {
-        files.add(prefixContent ? withContentPrefix(hrefRaw) : hrefRaw);
-        const lastSlash = hrefRaw.lastIndexOf('/');
+      const fileAnchor = hrefRaw || archivoBase;
+      if (fileAnchor) {
+        files.add(prefixContent ? withContentPrefix(fileAnchor) : fileAnchor);
+        const lastSlash = fileAnchor.lastIndexOf('/');
         if (lastSlash > 0) {
-          const baseDir = hrefRaw.slice(0, lastSlash + 1);
+          const baseDir = fileAnchor.slice(0, lastSlash + 1);
           archivosNormalized.forEach((archivoPath) => {
             if (archivoPath.startsWith(baseDir)) {
               files.add(prefixContent ? withContentPrefix(archivoPath) : archivoPath);
@@ -107,6 +108,14 @@ const buildResourcesXml = (recursos, archivos = [], options = {}) => {
           });
         }
       }
+
+      const extraFiles = Array.isArray(recurso.extra_files) ? recurso.extra_files : [];
+      extraFiles.forEach((extra) => {
+        const normalizedExtra = normalizeRelativePath(extra);
+        if (normalizedExtra) {
+          files.add(prefixContent ? withContentPrefix(normalizedExtra) : normalizedExtra);
+        }
+      });
 
       const filesXml = [...files]
         .map((fileHref) => `<file href="${escapeXml(fileHref)}" />`)
@@ -263,10 +272,14 @@ const buildManifestXml2004 = ({
   version="${escapeXml(manifest.version || '1.0')}"
   xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"
   xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"
+  xmlns:imsss="http://www.imsglobal.org/xsd/imsss"
+  xmlns:adlnav="http://www.adlnet.org/xsd/adlnav_v1p3"
   xmlns:imsmd="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd
   http://www.adlnet.org/xsd/adlcp_v1p3 adlcp_v1p3.xsd
+  http://www.imsglobal.org/xsd/imsss imsss_v1p0.xsd
+  http://www.adlnet.org/xsd/adlnav_v1p3 adlnav_v1p3.xsd
   http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd">
   <metadata>
     <schema>ADL SCORM</schema>
@@ -296,6 +309,10 @@ const validateScormData = ({ manifest, organizaciones, items, recursos, archivos
     errors.push('Manifest sin identificador');
   }
 
+  if (!organizaciones || !organizaciones.length) {
+    errors.push('No existen organizaciones en el manifest');
+  }
+
   const orgIds = new Set();
   organizaciones.forEach((org) => {
     if (!org.identificador) {
@@ -307,6 +324,13 @@ const validateScormData = ({ manifest, organizaciones, items, recursos, archivos
     }
     orgIds.add(org.identificador);
   });
+
+  if (organizaciones.length) {
+    const hasDefault = organizaciones.some((org) => org.es_principal === 1);
+    if (!hasDefault) {
+      errors.push('Organizacion principal no definida');
+    }
+  }
 
   const resourceIds = new Set();
   const resourceIdByPk = new Map();
@@ -339,6 +363,9 @@ const validateScormData = ({ manifest, organizaciones, items, recursos, archivos
     itemIds.add(item.identificador);
     if (item.id_recurso && !resourceIdByPk.has(item.id_recurso)) {
       errors.push(`Item sin recurso valido (id_item=${item.id_item})`);
+    }
+    if (item.id_recurso && !item.recurso_identificador) {
+      errors.push(`Item con recurso sin identificador (id_item=${item.id_item})`);
     }
   });
 

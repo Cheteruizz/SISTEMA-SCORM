@@ -1,0 +1,28 @@
+.global-back {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(11, 46, 78, 0.18);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-principal);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(11, 46, 78, 0.1);
+  backdrop-filter: blur(6px);
+}
+
+.global-back:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.global-back:active {
+  transform: translateY(0);
+}
