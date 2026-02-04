@@ -6,6 +6,49 @@ const ScormRuntimeObjetivo = require('../models/scorm_runtime_objetivo.model');
 const ScormRuntimeComentario = require('../models/scorm_runtime_comentario.model');
 const { validarSet, validarGet, validarValor } = require('../services/scorm_runtime_validator');
 
+const is2004Version = (version) => String(version || '').startsWith('2004');
+
+const buildDefaultCmiItems = (version, data = {}) => {
+  const userId = data.id_aprendiz || data.id_usuario || '';
+  const userName = data.nombre_aprendiz || data.nombre_usuario || '';
+  const launchData = data.datos_lanzamiento || '';
+  const credit = data.credito || 'credit';
+  const entry = data.modo_entrada || 'ab-initio';
+  const mode12 = data.modo || 'normal';
+  const mode2004 = data.modo || 'normal';
+
+  if (is2004Version(version)) {
+    return [
+      { clave_cmi: 'cmi._version', valor_cmi: '1.0' },
+      { clave_cmi: 'cmi.learner_id', valor_cmi: String(userId) },
+      { clave_cmi: 'cmi.learner_name', valor_cmi: String(userName) },
+      { clave_cmi: 'cmi.credit', valor_cmi: credit },
+      { clave_cmi: 'cmi.entry', valor_cmi: entry },
+      { clave_cmi: 'cmi.mode', valor_cmi: mode2004 },
+      { clave_cmi: 'cmi.launch_data', valor_cmi: String(launchData) },
+      { clave_cmi: 'cmi.max_time_allowed', valor_cmi: '' },
+      { clave_cmi: 'cmi.time_limit_action', valor_cmi: '' },
+      { clave_cmi: 'cmi.completion_threshold', valor_cmi: '' },
+      { clave_cmi: 'cmi.scaled_passing_score', valor_cmi: '' },
+      { clave_cmi: 'cmi.total_time', valor_cmi: 'PT0S' },
+    ];
+  }
+
+  return [
+    { clave_cmi: 'cmi.core.student_id', valor_cmi: String(userId) },
+    { clave_cmi: 'cmi.core.student_name', valor_cmi: String(userName) },
+    { clave_cmi: 'cmi.core.lesson_mode', valor_cmi: mode12 },
+    { clave_cmi: 'cmi.core.credit', valor_cmi: credit },
+    { clave_cmi: 'cmi.core.entry', valor_cmi: entry },
+    { clave_cmi: 'cmi.core.total_time', valor_cmi: '0000:00:00' },
+    { clave_cmi: 'cmi.launch_data', valor_cmi: String(launchData) },
+    { clave_cmi: 'cmi.student_data.mastery_score', valor_cmi: '' },
+    { clave_cmi: 'cmi.student_data.max_time_allowed', valor_cmi: '' },
+    { clave_cmi: 'cmi.student_data.time_limit_action', valor_cmi: '' },
+    { clave_cmi: 'cmi.comments_from_lms', valor_cmi: '' },
+  ];
+};
+
 const extraerInteracciones = (version, items) => {
   const map = new Map();
 
@@ -97,7 +140,12 @@ const crearSesion = async (req, res) => {
       return res.status(400).json({ mensaje: 'id_proyecto es obligatorio' });
     }
 
+    const version = req.body?.version_scorm || '1.2';
     const id_sesion = await ScormRuntimeSesion.crear(req.body);
+    const defaults = buildDefaultCmiItems(version, req.body);
+    if (defaults.length) {
+      await ScormRuntimeCmi.guardarLote(id_sesion, defaults);
+    }
     return res.status(201).json({ mensaje: 'Sesion creada', id_sesion });
   } catch (err) {
     console.error('Error al crear sesion runtime:', err);

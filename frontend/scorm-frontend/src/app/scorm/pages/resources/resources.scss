@@ -71,6 +71,28 @@ $dorado: #d4af37;             // Para la flecha
   margin: 0 auto 30px auto;
 }
 
+.acciones-superior {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.btn-secundario {
+  background: transparent;
+  border: 2px solid $azul-oscuro;
+  color: $azul-oscuro;
+  padding: 10px 28px;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secundario:hover {
+  background: $azul-oscuro;
+  color: white;
+}
+
 // Formulario
 .formulario-recursos {
   text-align: left;
@@ -86,22 +108,23 @@ $dorado: #d4af37;             // Para la flecha
 
 .grid-inputs {
   display: grid;
-  grid-template-columns: 1fr 1fr; // Dos columnas
-  gap: 20px 40px;
-  align-items: center;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 28px;
+  align-items: start;
 }
 
 .grupo-input {
   display: flex;
-  align-items: center;
-  gap: 15px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 
   label {
     color: $azul-oscuro;
     font-size: 1.1rem;
-    white-space: nowrap; // Que no se rompa la línea del label
-    min-width: 150px;
-    text-align: right;
+    white-space: normal;
+    min-width: unset;
+    text-align: left;
   }
 
   input.input-borde-azul {
@@ -182,4 +205,49 @@ $dorado: #d4af37;             // Para la flecha
 
 .btn-preview {
   background-color: $azul-oscuro;
+}
+
+.tracking-box {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 20px;
+  border: 2px dashed $borde-azul;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.recursos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.recurso-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid $borde-azul;
+  cursor: grab;
+}
+
+.recurso-row small {
+  color: $color-texto-gris;
+}
+
+.auto-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: $azul-oscuro;
+}
+
+@media (max-width: 900px) {
+  .grid-inputs {
+    grid-template-columns: 1fr;
+  }
 }

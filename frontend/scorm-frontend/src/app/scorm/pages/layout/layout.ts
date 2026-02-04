@@ -1,6 +1,5 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { ScormStateService } from '../../../services/scorm-state.service';
 import { ScormNavComponent } from '../../components/scorm-nav/scorm-nav';
 
 @Component({
@@ -12,7 +11,6 @@ import { ScormNavComponent } from '../../components/scorm-nav/scorm-nav';
 })
 export class LayoutComponent {
   private router = inject(Router);
-  private state = inject(ScormStateService);
 
 
 
@@ -24,11 +22,6 @@ export class LayoutComponent {
   historial(){
     //Va al historial de paquetes creados
     this.router.navigate(['/history']);
-  }
-
-  importarProyecto(){
-    this.state.setImportReturn('/layout');
-    this.router.navigate(['/importar']);
   }
 
   volver(){

@@ -39,6 +39,8 @@ const crearItem = async (req, res) => {
       id_modulo,
       id_leccion,
       id_recurso,
+      sequencing_xml,
+      navigation_xml,
     } = req.body;
 
     if (!id_organizacion || !identificador || !titulo) {
@@ -58,6 +60,8 @@ const crearItem = async (req, res) => {
       id_modulo,
       id_leccion,
       id_recurso,
+      sequencing_xml,
+      navigation_xml,
     });
 
     return res.status(201).json({
@@ -83,6 +87,8 @@ const actualizarItem = async (req, res) => {
       id_modulo,
       id_leccion,
       id_recurso,
+      sequencing_xml,
+      navigation_xml,
     } = req.body;
 
     if (!identificador || !titulo) {
@@ -101,6 +107,8 @@ const actualizarItem = async (req, res) => {
       id_modulo,
       id_leccion,
       id_recurso,
+      sequencing_xml,
+      navigation_xml,
     });
 
     if (!affected) {

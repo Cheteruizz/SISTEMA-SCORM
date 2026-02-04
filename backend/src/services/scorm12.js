@@ -64,17 +64,33 @@ const buildItemTree = (items) => {
   return roots;
 };
 
-const buildItemXml = (node) => {
+const DEFAULT_FLOW_SEQUENCING =
+  String(process.env.DEFAULT_FLOW_SEQUENCING || 'true').toLowerCase() !== 'false';
+
+const buildItemXml = (node, options = {}) => {
   const identifier = escapeXml(node.identificador);
   const title = escapeXml(node.titulo);
-  const isVisible = node.es_lanzable ? 'true' : 'false';
+  const isVisible = node.es_visible === 0 ? 'false' : 'true';
   const identifierref =
     node.id_recurso && node.recurso_identificador
       ? ` identifierref="${escapeXml(node.recurso_identificador)}"`
       : '';
 
-  const childrenXml = (node.children || []).map(buildItemXml).join('');
-  return `<item identifier="${identifier}"${identifierref} isvisible="${isVisible}"><title>${title}</title>${childrenXml}</item>`;
+  const childrenXml = (node.children || [])
+    .map((child) => buildItemXml(child, options))
+    .join('');
+  const needsDefaultSequencing =
+    options.includeExtensions &&
+    DEFAULT_FLOW_SEQUENCING &&
+    !(node.sequencing_xml || node.navigation_xml) &&
+    (node.children || []).length > 0;
+  const defaultSequencingXml = needsDefaultSequencing
+    ? `<imsss:sequencing><imsss:controlMode choice="false" flow="true"/></imsss:sequencing>`
+    : '';
+  const extensionXml = options.includeExtensions
+    ? [node.sequencing_xml, node.navigation_xml, defaultSequencingXml].filter(Boolean).join('')
+    : '';
+  return `<item identifier="${identifier}"${identifierref} isvisible="${isVisible}"><title>${title}</title>${extensionXml}${childrenXml}</item>`;
 };
 
 const buildResourcesXml = (recursos, archivos = [], options = {}) => {
@@ -142,7 +158,9 @@ const buildManifestXml = ({
   const orgsXml = organizaciones
     .map((org) => {
       const orgItems = items.filter((item) => item.id_organizacion === org.id_organizacion);
-      const itemsTree = buildItemTree(orgItems).map((node) => buildItemXml(node)).join('');
+      const itemsTree = buildItemTree(orgItems)
+        .map((node) => buildItemXml(node, { includeExtensions: false }))
+        .join('');
       const identifier = escapeXml(org.identificador);
       const title = escapeXml(org.titulo);
       return `<organization identifier="${identifier}"><title>${title}</title>${itemsTree}</organization>`;
@@ -228,7 +246,9 @@ const buildManifestXml2004 = ({
   const orgsXml = organizaciones
     .map((org) => {
       const orgItems = items.filter((item) => item.id_organizacion === org.id_organizacion);
-      const itemsTree = buildItemTree(orgItems).map((node) => buildItemXml(node)).join('');
+      const itemsTree = buildItemTree(orgItems)
+        .map((node) => buildItemXml(node, { includeExtensions: true }))
+        .join('');
       const identifier = escapeXml(org.identificador);
       const title = escapeXml(org.titulo);
       return `<organization identifier="${identifier}"><title>${title}</title>${itemsTree}</organization>`;
@@ -302,7 +322,7 @@ const buildManifestXml2004 = ({
 </manifest>`;
 };
 
-const validateScormData = ({ manifest, organizaciones, items, recursos, archivos }) => {
+const validateScormData = ({ manifest, organizaciones, items, recursos, archivos, modulos = [], lecciones = [] }) => {
   const errors = [];
 
   if (!manifest || !manifest.identificador) {
@@ -367,6 +387,26 @@ const validateScormData = ({ manifest, organizaciones, items, recursos, archivos
     if (item.id_recurso && !item.recurso_identificador) {
       errors.push(`Item con recurso sin identificador (id_item=${item.id_item})`);
     }
+  });
+
+  const moduloIds = new Set();
+  modulos.forEach((mod) => {
+    const codigo = String(mod.codigo_modulo || '').trim();
+    if (!codigo) return;
+    if (moduloIds.has(codigo)) {
+      errors.push(`Codigo de modulo duplicado: ${codigo}`);
+    }
+    moduloIds.add(codigo);
+  });
+
+  const leccionIds = new Set();
+  lecciones.forEach((lec) => {
+    const codigo = String(lec.codigo_leccion || '').trim();
+    if (!codigo) return;
+    if (leccionIds.has(codigo)) {
+      errors.push(`Codigo de leccion duplicado: ${codigo}`);
+    }
+    leccionIds.add(codigo);
   });
 
   archivos.forEach((archivo) => {

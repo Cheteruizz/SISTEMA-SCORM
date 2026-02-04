@@ -36,11 +36,12 @@ const ProyectoMetadata = {
     nivel_dificultad,
     objetivo,
     descripcion_detallada,
+    portada_ruta,
   }) {
     const [result] = await db.query(
       `INSERT INTO proyecto_metadata
-        (id_proyecto, idioma, autor_principal, organizacion, entidad_publicadora, palabras_clave, nivel_dificultad, objetivo, descripcion_detallada)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (id_proyecto, idioma, autor_principal, organizacion, entidad_publicadora, palabras_clave, nivel_dificultad, objetivo, descripcion_detallada, portada_ruta)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id_proyecto,
         idioma || 'es',
@@ -51,6 +52,7 @@ const ProyectoMetadata = {
         nivel_dificultad || null,
         objetivo || null,
         descripcion_detallada || null,
+        portada_ruta || null,
       ]
     );
     return result.insertId;
@@ -67,11 +69,12 @@ const ProyectoMetadata = {
       nivel_dificultad,
       objetivo,
       descripcion_detallada,
+      portada_ruta,
     }
   ) {
     const [result] = await db.query(
       `UPDATE proyecto_metadata
-       SET idioma = ?, autor_principal = ?, organizacion = ?, entidad_publicadora = ?, palabras_clave = ?, nivel_dificultad = ?, objetivo = ?, descripcion_detallada = ?
+       SET idioma = ?, autor_principal = ?, organizacion = ?, entidad_publicadora = ?, palabras_clave = ?, nivel_dificultad = ?, objetivo = ?, descripcion_detallada = ?, portada_ruta = ?
        WHERE id_metadata = ?`,
       [
         idioma || 'es',
@@ -82,6 +85,7 @@ const ProyectoMetadata = {
         nivel_dificultad || null,
         objetivo || null,
         descripcion_detallada || null,
+        portada_ruta || null,
         id_metadata,
       ]
     );

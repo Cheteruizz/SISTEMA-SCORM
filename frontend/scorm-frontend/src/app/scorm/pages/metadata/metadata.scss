@@ -33,6 +33,10 @@
   margin-bottom: 20px;
 }
 
+.tracking-section {
+  margin-top: 30px;
+}
+
 .descripcion-seccion {
   max-width: 680px;
   margin: 0 auto;
@@ -218,4 +222,36 @@ form {
   margin-left: 10px;
   margin-top: 5px;
   text-align: left;
+}
+
+.cover-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.cover-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.cover-preview img {
+  width: 100%;
+  max-width: 520px;
+  border-radius: 16px;
+  border: 2px solid var(--color-principal);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.cover-input input[type="file"] {
+  border: 2px solid var(--color-principal);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+  width: 100%;
+  max-width: 520px;
 }

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { ScormStateService } from '../../../services/scorm-state.service';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-scorm-home',
@@ -20,6 +21,7 @@ export class HomeComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
   private state = inject(ScormStateService);
+  private toast = inject(ToastService);
   loginForm: FormGroup;
   registroForm: FormGroup;
 
@@ -56,7 +58,7 @@ export class HomeComponent {
           this.router.navigate(['/layout']);
         },
         error: (error) => {
-          alert('Usuario o contrasena incorrectos');
+          this.toast.error('Usuario o contrasena incorrectos.');
           console.error(error);
         },
       });
@@ -68,7 +70,7 @@ export class HomeComponent {
       // Validacion extra: comprobar que las contrasenas coinciden
       const datos = this.registroForm.value;
       if (datos.password !== datos.repetirPassword) {
-        alert('Las contrasenas no coinciden');
+        this.toast.warn('Las contrasenas no coinciden.');
         return;
       }
 
@@ -81,12 +83,12 @@ export class HomeComponent {
           this.router.navigate(['/layout']);
         },
         error: (error: any) => {
-          alert('Error al registrar usuario');
+          this.toast.error('Error al registrar usuario.');
           console.error(error);
         },
       });
     } else {
-      alert('Por favor, rellena todos los campos correctamente');
+      this.toast.warn('Por favor, rellena todos los campos correctamente.');
     }
   }
 }

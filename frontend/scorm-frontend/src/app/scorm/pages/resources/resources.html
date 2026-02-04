@@ -11,11 +11,23 @@
         Puedes a&#241;adir tantos recursos como desees.
       </p>
     </div>
+    <div class="acciones-superior">
+      <button class="btn-secundario" type="button" (click)="guardarBorrador()">Guardar borrador y salir</button>
+    </div>
 
     <form [formGroup]="recursosForm" class="formulario-recursos">
       <h3 class="subtitulo-archivo">Archivo:</h3>
 
       <div class="grid-inputs">
+        <div class="grupo-input">
+          <label>M&#243;dulo:</label>
+          <select class="input-borde-azul" [value]="moduloSeleccionado" (change)="onModuloChange($any($event.target).value)">
+            <option *ngFor="let mod of modulos" [value]="mod.id_modulo">
+              {{ mod.label }}
+            </option>
+          </select>
+        </div>
+
         <div class="grupo-input">
           <label>Nombre del Archivo:</label>
           <input type="text" formControlName="nombreArchivo" class="input-borde-azul">
@@ -23,14 +35,18 @@
 
         <div class="grupo-input">
           <label>ID del Archivo:</label>
-          <input type="text" formControlName="idArchivo" class="input-borde-azul" placeholder="Se genera automatico" [disabled]="true">
+          <input type="text" formControlName="recursoId" class="input-borde-azul" placeholder="Se genera automatico" [disabled]="autoRecursoId">
+          <label class="auto-id">
+            <input type="checkbox" [(ngModel)]="autoRecursoId">
+            Generar ID automaticamente
+          </label>
         </div>
 
         <div class="grupo-input">
           <label>ID Lecci&#243;n:</label>
           <select formControlName="idLeccion" class="input-borde-azul">
             <option value="">Selecciona una lecci&#243;n</option>
-            <option *ngFor="let lec of lecciones" [value]="lec.id_leccion">
+            <option *ngFor="let lec of leccionesFiltradas" [value]="lec.id_leccion">
               {{ lec.label }}
             </option>
           </select>
@@ -40,13 +56,63 @@
           <label>Tipo de Archivo:</label>
           <input type="file" formControlName="tipoArchivo" class="input-borde-azul"
                  (change)="onFileSelected($event)"
-                 accept=".html,.js,.css,.json,.png,.jpg,.jpeg,.svg,.gif,.mp4,.webm,.mp3,.wav,.pdf">
+                 accept=".html,.js,.css,.json,.xml,.txt,.csv,.png,.jpg,.jpeg,.svg,.svgz,.gif,.webp,.ico,.woff,.woff2,.ttf,.otf,.eot,.mp4,.m4v,.webm,.mpg,.mpeg,.mp3,.wav,.pdf">
         </div>
 
         <div class="texto-ayuda-container">
           <p class="texto-ayuda">
-            Este sistema permite adjuntar HTML, JS, CSS, JSON, imagenes, audio, video y PDF.
+            Este sistema permite adjuntar HTML, JS, CSS, JSON, XML, imagenes, audio, video, fuentes y PDF.
           </p>
+        </div>
+      </div>
+      <div class="tracking-box" *ngIf="archivoSeleccionado">
+        <h3 class="subtitulo-archivo">Tracking automatico</h3>
+        <div class="grid-inputs">
+          <div class="grupo-input">
+            <label>Preset:</label>
+            <select formControlName="trackingPreset" class="input-borde-azul" (change)="onPresetChange($any($event.target).value)">
+              <option value="auto">Auto (segun tipo)</option>
+              <option value="static">Estatico (PDF/imagen)</option>
+              <option value="media">Media (video/audio)</option>
+              <option value="manual">Personalizado</option>
+            </select>
+          </div>
+          <div class="grupo-input">
+            <label>
+              <input type="checkbox" formControlName="trackingAuto">
+              Habilitar autocompletado
+            </label>
+          </div>
+          <div class="grupo-input">
+            <label>Minimo minutos (PDF/imagen):</label>
+            <input type="number" formControlName="trackingMinMinutes" class="input-borde-azul" min="0" step="0.5"
+                   [disabled]="recursosForm.value.trackingPreset !== 'manual'">
+          </div>
+          <div class="grupo-input">
+            <label>Ratio de completion (video/audio):</label>
+            <input type="number" formControlName="trackingMediaRatio" class="input-borde-azul" min="0.5" max="0.99" step="0.05"
+                   [disabled]="recursosForm.value.trackingPreset !== 'manual'">
+          </div>
+        </div>
+        <p class="texto-ayuda">
+          Para video/audio, el sistema completa al % indicado. Para PDF/imagenes, completa tras el minimo de minutos.
+        </p>
+        <p class="texto-ayuda">
+          Si no eliges “Personalizado”, se aplican los valores predeterminados segun el tipo de archivo.
+        </p>
+      </div>
+      <div class="tracking-box" *ngIf="recursosLeccion.length">
+        <h3 class="subtitulo-archivo">Recursos en la leccion</h3>
+        <div class="recursos-lista">
+          <div class="recurso-row"
+               *ngFor="let res of recursosLeccion"
+               draggable="true"
+               (dragstart)="onDragStartRecurso(res)"
+               (dragover)="$event.preventDefault()"
+               (drop)="onDropRecurso(res)">
+            <span>{{ res.titulo }}</span>
+            <small>Arrastra para reordenar</small>
+          </div>
         </div>
       </div>
     </form>
@@ -56,7 +122,6 @@
     <button class="btn-accion" (click)="eliminarArchivo()">Eliminar Archivo</button>
     <button class="btn-accion" (click)="subirArchivo()">Subir Archivo</button>
     <button class="btn-accion" (click)="irAEditorSco()">Editor SCO</button>
-    <button class="btn-accion" (click)="irAImportar()">Importar Manifest</button>
     <button class="btn-accion btn-preview" (click)="irAVistaPrevia()">Vista previa</button>
   </div>
   </div>

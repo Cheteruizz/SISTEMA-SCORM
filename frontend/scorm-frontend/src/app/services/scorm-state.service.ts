@@ -9,7 +9,6 @@ export class ScormStateService {
   private orgKey = 'scorm_org_id';
   private versionKey = 'scorm_version';
   private userKey = 'scorm_user_id';
-  private importReturnKey = 'scorm_import_return';
 
   setUserId(id: number) {
     localStorage.setItem(this.userKey, String(id));
@@ -62,15 +61,4 @@ export class ScormStateService {
     localStorage.removeItem(this.versionKey);
   }
 
-  setImportReturn(path: string) {
-    localStorage.setItem(this.importReturnKey, path);
-  }
-
-  getImportReturn(): string | null {
-    return localStorage.getItem(this.importReturnKey);
-  }
-
-  clearImportReturn() {
-    localStorage.removeItem(this.importReturnKey);
-  }
 }

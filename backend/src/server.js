@@ -16,13 +16,25 @@ const recursoRoutes = require('./routes/recurso.routes');
 const paqueteRoutes = require('./routes/paquete_generado.routes');
 const metadataRoutes = require('./routes/proyecto_metadata.routes');
 const scormRoutes = require('./routes/scorm.routes');
-const scormImportRoutes = require('./routes/scorm_import.routes');
 const runtimeRoutes = require('./routes/scorm_runtime.routes');
 const scoRoutes = require('./routes/scorm_sco.routes');
 
 const app = express();
 
-app.use(cors());
+const corsOrigins = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+app.use(
+  cors(
+    corsOrigins.length
+      ? {
+          origin: corsOrigins,
+          credentials: true,
+        }
+      : undefined
+  )
+);
 app.use(express.json());
 
 const baseDir = path.resolve(__dirname, '..');
@@ -44,7 +56,6 @@ app.use('/api/recursos', recursoRoutes);
 app.use('/api/paquetes', paqueteRoutes);
 app.use('/api/metadata', metadataRoutes);
 app.use('/api/scorm', scormRoutes);
-app.use('/api/scorm', scormImportRoutes);
 app.use('/api/scorm/runtime', runtimeRoutes);
 app.use('/api/scorm/sco', scoRoutes);
 

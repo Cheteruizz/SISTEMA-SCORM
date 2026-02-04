@@ -26,6 +26,14 @@
         Version SCORM: {{ proyecto.version_scorm }} ·
         Creado: {{ proyecto.fecha_creacion | date:'short' }}
       </p>
+      <div class="history-actions">
+        <button type="button" class="btn-outline" (click)="editarProyecto(proyecto)">
+          Editar
+        </button>
+        <button type="button" class="btn-danger" (click)="eliminarProyecto(proyecto)">
+          Borrar
+        </button>
+      </div>
 
       <div class="history-sub" *ngIf="(paquetesPorProyecto[proyecto.id_proyecto] || []).length">
         <p>Paquetes generados:</p>

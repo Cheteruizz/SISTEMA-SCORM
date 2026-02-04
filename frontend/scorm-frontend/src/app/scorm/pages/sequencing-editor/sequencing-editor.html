@@ -1,0 +1,44 @@
+<app-scorm-nav></app-scorm-nav>
+
+<section class="sequencing">
+  <header class="sequencing__header">
+    <h1>Editor de secuenciación (SCORM 2004)</h1>
+    <p>Edita los fragmentos XML de secuenciación y navegación por item.</p>
+  </header>
+
+  <div class="sequencing__state" *ngIf="cargando">Cargando items...</div>
+
+  <div class="sequencing__form" *ngIf="!cargando">
+    <label>
+      Item
+      <select (change)="seleccionarItem($any($event.target).value)">
+        <option value="">Selecciona un item</option>
+        <option *ngFor="let item of items" [value]="item.id_item">
+          {{ item.identificador }} - {{ item.titulo }}
+        </option>
+      </select>
+    </label>
+
+    <div *ngIf="selectedItem" class="sequencing__editors">
+      <label>
+        Preset visual
+        <select (change)="aplicarPreset($any($event.target).value)">
+          <option value="">Selecciona un preset</option>
+          <option value="free">Libre (sin restricciones)</option>
+          <option value="sequential">Secuencial simple</option>
+          <option value="completed">Bloquear hasta completar</option>
+        </select>
+      </label>
+      <label>
+        imsss:sequencing
+        <textarea [(ngModel)]="sequencingXml" rows="8"></textarea>
+      </label>
+      <label>
+        adlnav:navigation
+        <textarea [(ngModel)]="navigationXml" rows="6"></textarea>
+      </label>
+
+      <button type="button" class="btn-solid" (click)="guardar()">Guardar</button>
+    </div>
+  </div>
+</section>

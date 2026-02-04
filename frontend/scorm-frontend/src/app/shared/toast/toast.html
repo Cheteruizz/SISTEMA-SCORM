@@ -1,0 +1,16 @@
+<section class="toast-stack" [class.is-visible]="hasToasts()" aria-live="polite" aria-atomic="true">
+  <article
+    class="toast"
+    *ngFor="let toast of toasts()"
+    [attr.data-type]="toast.type"
+    [attr.role]="toast.type === 'error' ? 'alert' : 'status'"
+  >
+    <div class="toast__body">
+      <span class="toast__label">{{ toast.type }}</span>
+      <p class="toast__message">{{ toast.message }}</p>
+    </div>
+    <button type="button" class="toast__close" (click)="dismiss(toast.id)" aria-label="Cerrar">
+      ×
+    </button>
+  </article>
+</section>

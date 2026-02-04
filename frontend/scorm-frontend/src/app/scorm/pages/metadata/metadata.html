@@ -95,6 +95,59 @@
               </div>
             </div>
 
+            <div class="encabezado-seccion">
+              <h2 class="subtitulo-seccion">Portada del curso</h2>
+              <p class="descripcion-seccion">Esta imagen se ver&#225; en el reproductor del LMS como miniatura.</p>
+            </div>
+
+            <div class="cover-upload">
+              <div class="cover-preview" *ngIf="coverPreview">
+                <img [src]="coverPreview" alt="Portada del curso">
+                <button type="button" class="btn-secundario" (click)="limpiarPortada()">Quitar portada</button>
+              </div>
+              <div class="cover-input" *ngIf="!coverPreview">
+                <input type="file" accept="image/*" (change)="onCoverSelected($event)">
+                <small>Formatos recomendados: JPG/PNG. Tama&#241;o sugerido 1280x720.</small>
+              </div>
+            </div>
+
+            <div class="encabezado-seccion tracking-section">
+              <h2 class="subtitulo-seccion">Tracking predeterminado del curso</h2>
+              <p class="descripcion-seccion">Estos valores se aplicaran a los nuevos recursos si no se personalizan.</p>
+            </div>
+
+            <div class="grid-formulario tres-columnas">
+              <div class="campo-formulario">
+                <label>Preset:</label>
+                <div class="select-wrapper">
+                  <select formControlName="trackingPresetDefault">
+                    <option value="auto">Auto (segun tipo)</option>
+                    <option value="static">Estatico (PDF/imagen)</option>
+                    <option value="media">Media (video/audio)</option>
+                    <option value="manual">Personalizado</option>
+                  </select>
+                  <span class="flecha-abajo">&#9660;</span>
+                </div>
+              </div>
+
+              <div class="campo-formulario">
+                <label>
+                  <input type="checkbox" formControlName="trackingAutoDefault">
+                  Autocompletar
+                </label>
+              </div>
+
+              <div class="campo-formulario">
+                <label>Min. minutos (PDF/imagen):</label>
+                <input type="number" step="0.5" min="0" formControlName="trackingMinMinutesDefault">
+              </div>
+
+              <div class="campo-formulario">
+                <label>Ratio completion (video/audio):</label>
+                <input type="number" step="0.05" min="0.5" max="0.99" formControlName="trackingMediaRatioDefault">
+              </div>
+            </div>
+
             <div class="acciones-paso final">
               <button type="button" class="btn-secundario" (click)="cambiarPaso('infoBasica')">Atr&#225;s</button>
               <button type="submit" class="btn-continuar btn-final">

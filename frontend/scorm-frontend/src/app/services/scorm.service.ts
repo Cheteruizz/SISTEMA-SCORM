@@ -1,13 +1,14 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_BASE_URL } from '../config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ScormService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = API_BASE_URL;
 
   crearProyecto(data: {
     id_usuario: number;
@@ -15,6 +16,10 @@ export class ScormService {
     descripcion?: string;
     version_scorm: string;
     estado: string;
+    tracking_preset_default?: string;
+    tracking_auto_default?: boolean;
+    tracking_min_seconds_default?: number;
+    tracking_media_ratio_default?: number;
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/proyectos`, data);
   }
@@ -28,12 +33,20 @@ export class ScormService {
     descripcion?: string;
     version_scorm: string;
     estado: string;
+    tracking_preset_default?: string;
+    tracking_auto_default?: boolean;
+    tracking_min_seconds_default?: number;
+    tracking_media_ratio_default?: number;
   }): Observable<any> {
     return this.http.put(`${this.apiUrl}/proyectos/${id_proyecto}`, data);
   }
 
   obtenerProyecto(id_proyecto: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/proyectos/${id_proyecto}`);
+  }
+
+  eliminarProyecto(id_proyecto: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/proyectos/${id_proyecto}`);
   }
 
   crearMetadata(data: {
@@ -45,6 +58,7 @@ export class ScormService {
     palabras_clave?: string;
     objetivo?: string;
     descripcion_detallada?: string;
+    portada_ruta?: string;
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/metadata`, data);
   }
@@ -57,6 +71,10 @@ export class ScormService {
     return this.http.post(`${this.apiUrl}/manifests`, data);
   }
 
+  listarManifests(id_proyecto: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/manifests`, { params: { id_proyecto } });
+  }
+
   crearOrganizacion(data: {
     id_manifest: number;
     identificador: string;
@@ -64,6 +82,10 @@ export class ScormService {
     es_principal: number;
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/organizaciones`, data);
+  }
+
+  listarOrganizaciones(id_manifest: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/organizaciones`, { params: { id_manifest } });
   }
 
   listarModulos(id_proyecto: number): Observable<any> {
@@ -80,6 +102,15 @@ export class ScormService {
     return this.http.post(`${this.apiUrl}/modulos`, data);
   }
 
+  actualizarModulo(id_modulo: number, data: {
+    nombre_modulo: string;
+    descripcion?: string;
+    duracion_minutos?: number | null;
+    codigo_modulo?: string | null;
+  }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/modulos/${id_modulo}`, data);
+  }
+
   listarLecciones(id_modulo: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/lecciones`, { params: { id_modulo } });
   }
@@ -93,6 +124,16 @@ export class ScormService {
     codigo_leccion?: string | null;
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/lecciones`, data);
+  }
+
+  actualizarLeccion(id_leccion: number, data: {
+    nombre_leccion: string;
+    tipo_leccion: string;
+    descripcion?: string;
+    duracion_minutos?: number | null;
+    codigo_leccion?: string | null;
+  }): Observable<any> {
+    return this.http.put(`${this.apiUrl}/lecciones/${id_leccion}`, data);
   }
 
   eliminarLeccion(id_leccion: number): Observable<any> {
@@ -124,6 +165,7 @@ export class ScormService {
     href: string;
     tipo_recurso: string;
     scorm_type: string;
+    parametros?: string;
   }): Observable<any> {
     return this.http.post(`${this.apiUrl}/recursos`, data);
   }
@@ -151,6 +193,10 @@ export class ScormService {
     return this.http.get(`${this.apiUrl}/items`, { params: { id_organizacion } });
   }
 
+  actualizarItem(id_item: number, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/items/${id_item}`, data);
+  }
+
   generarScorm(id_proyecto: number): Observable<Blob> {
     return this.http.post(`${this.apiUrl}/scorm/${id_proyecto}/generar-1-2`, {}, { responseType: 'blob' });
   }
@@ -163,41 +209,8 @@ export class ScormService {
     return this.http.get(`${this.apiUrl}/scorm/${id_proyecto}/validar`);
   }
 
-  importarManifest(id_proyecto: number, file: File, options: { dryRun?: boolean; archivoMap?: string } = {}): Observable<any> {
-    const form = new FormData();
-    form.append('id_proyecto', String(id_proyecto));
-    form.append('manifest', file);
-    if (options.dryRun) {
-      form.append('dry_run', 'true');
-    }
-    if (options.archivoMap) {
-      form.append('archivo_map', options.archivoMap);
-    }
-    return this.http.post(`${this.apiUrl}/scorm/importar-manifest`, form);
-  }
-
-  importarZip(id_proyecto: number, file: File, options: { dryRun?: boolean; crearProyecto?: boolean; titulo?: string; descripcion?: string; id_usuario?: number | null } = {}): Observable<any> {
-    const form = new FormData();
-    if (id_proyecto) {
-      form.append('id_proyecto', String(id_proyecto));
-    }
-    form.append('zip', file);
-    if (options.dryRun) {
-      form.append('dry_run', 'true');
-    }
-    if (options.crearProyecto) {
-      form.append('crear_proyecto', 'true');
-    }
-    if (options.titulo) {
-      form.append('titulo', options.titulo);
-    }
-    if (options.descripcion) {
-      form.append('descripcion', options.descripcion);
-    }
-    if (options.id_usuario) {
-      form.append('id_usuario', String(options.id_usuario));
-    }
-    return this.http.post(`${this.apiUrl}/scorm/importar-zip`, form);
+  auditarScorm(id_proyecto: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/scorm/${id_proyecto}/auditar`);
   }
 
   listarPaquetes(id_proyecto: number): Observable<any> {
@@ -259,4 +272,5 @@ export class ScormService {
   eliminarScoArchivo(id_sco_archivo: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/scorm/sco/archivos/${id_sco_archivo}`);
   }
+
 }

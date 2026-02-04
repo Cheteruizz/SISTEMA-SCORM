@@ -76,15 +76,17 @@ const SCORM2004_INTERACTION_TYPES = new Set([
   'other',
 ]);
 
+const is2004Version = (version) => String(version || '').startsWith('2004');
+
 const getInteractionPattern = (version) => {
-  if (version === '2004_4th') {
+  if (is2004Version(version)) {
     return /^cmi\.interactions\.(\d+)\.(id|type|objective\.\d+\.id|learner_response|result|weighting|latency|timestamp|description)$/;
   }
   return /^cmi\.interactions\.(\d+)\.(id|type|objectives\.\d+\.id|student_response|result|weighting|latency|time)$/;
 };
 
 const getObjectivePattern = (version) => {
-  if (version === '2004_4th') {
+  if (is2004Version(version)) {
     return /^cmi\.objectives\.(\d+)\.(id|score\.(raw|min|max|scaled)|success_status|completion_status|progress_measure|description)$/;
   }
   return /^cmi\.objectives\.(\d+)\.(id|score\.(raw|min|max)|status)$/;
@@ -96,20 +98,20 @@ const isObjectiveKey = (version, key) => getObjectivePattern(version).test(key);
 const validarInteraccionValor = (version, key, value) => {
   const valueText = value === null || value === undefined ? '' : String(value);
   if (key.endsWith('.type')) {
-    const types = version === '2004_4th' ? SCORM2004_INTERACTION_TYPES : SCORM12_INTERACTION_TYPES;
+    const types = is2004Version(version) ? SCORM2004_INTERACTION_TYPES : SCORM12_INTERACTION_TYPES;
     if (!types.has(valueText)) {
-      return buildError(version, version === '2004_4th' ? 406 : 402, 'Tipo de interaccion invalido');
+      return buildError(version, is2004Version(version) ? 406 : 402, 'Tipo de interaccion invalido');
     }
   }
 
   if (key.endsWith('.weighting')) {
     if (valueText !== '' && Number.isNaN(Number(valueText))) {
-      return buildError(version, version === '2004_4th' ? 406 : 402, 'Valor invalido');
+      return buildError(version, is2004Version(version) ? 406 : 402, 'Valor invalido');
     }
   }
 
   if (key.endsWith('.latency')) {
-    if (version === '2004_4th') {
+    if (is2004Version(version)) {
       if (valueText && !SCORM2004_DURATION_RE.test(valueText)) {
         return buildError(version, 406, 'Formato de duracion invalido');
       }
@@ -125,10 +127,10 @@ const validarObjetivoValor = (version, key, value) => {
   const valueText = value === null || value === undefined ? '' : String(value);
   if (key.includes('score.')) {
     if (valueText !== '' && Number.isNaN(Number(valueText))) {
-      return buildError(version, version === '2004_4th' ? 406 : 402, 'Valor invalido');
+      return buildError(version, is2004Version(version) ? 406 : 402, 'Valor invalido');
     }
   }
-  if (version === '2004_4th') {
+  if (is2004Version(version)) {
     if (key.endsWith('success_status')) {
       if (!SCORM2004_ENUMS['cmi.success_status'].has(valueText)) {
         return buildError(version, 406, 'Valor invalido');
@@ -158,14 +160,14 @@ const isScormKey = (key) => {
 };
 
 const isReadOnly = (version, key) => {
-  if (version === '2004_4th') {
+  if (is2004Version(version)) {
     return SCORM2004_READ_ONLY.has(key);
   }
   return SCORM12_READ_ONLY.has(key);
 };
 
 const isWriteOnly = (version, key) => {
-  if (version === '2004_4th') {
+  if (is2004Version(version)) {
     return SCORM2004_WRITE_ONLY.has(key);
   }
   return SCORM12_WRITE_ONLY.has(key);
@@ -179,26 +181,26 @@ const buildError = (version, code, message) => ({
 
 const validarSet = (version, key) => {
   if (!isScormKey(key)) {
-    return buildError(version, version === '2004_4th' ? 401 : 401, 'Elemento invalido');
+    return buildError(version, is2004Version(version) ? 401 : 401, 'Elemento invalido');
   }
   if (isReadOnly(version, key)) {
-    return buildError(version, version === '2004_4th' ? 404 : 403, 'Elemento es solo lectura');
+    return buildError(version, is2004Version(version) ? 404 : 403, 'Elemento es solo lectura');
   }
   return null;
 };
 
 const validarGet = (version, key) => {
   if (!isScormKey(key)) {
-    return buildError(version, version === '2004_4th' ? 401 : 401, 'Elemento invalido');
+    return buildError(version, is2004Version(version) ? 401 : 401, 'Elemento invalido');
   }
   if (isWriteOnly(version, key)) {
-    return buildError(version, version === '2004_4th' ? 405 : 404, 'Elemento es solo escritura');
+    return buildError(version, is2004Version(version) ? 405 : 404, 'Elemento es solo escritura');
   }
   return null;
 };
 
 const validarValor = (version, key, value) => {
-  const is2004 = version === '2004_4th';
+  const is2004 = is2004Version(version);
   const enums = is2004 ? SCORM2004_ENUMS : SCORM12_ENUMS;
   const valueText = value === null || value === undefined ? '' : String(value);
 

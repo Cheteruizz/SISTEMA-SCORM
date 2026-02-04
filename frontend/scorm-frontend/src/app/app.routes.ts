@@ -47,14 +47,14 @@ export const routes: Routes = [
     component: HistoryComponent
   },
   {
+    path: 'sequencing',
+    loadComponent: () =>
+      import('./scorm/pages/sequencing-editor/sequencing-editor').then(m => m.SequencingEditorComponent),
+  },
+  {
     path: 'editor-sco',
     loadComponent: () =>
       import('./scorm/pages/sco-editor/sco-editor').then(m => m.ScoEditorComponent),
-  },
-  {
-    path: 'importar',
-    loadComponent: () =>
-      import('./scorm/pages/import/import').then(m => m.ImportComponent),
   },
   {
     path: '',

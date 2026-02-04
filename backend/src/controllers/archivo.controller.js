@@ -1,8 +1,14 @@
 // src/controllers/archivo.controller.js
 const Archivo = require('../models/archivo.model');
 
-const MAX_ARCHIVOS_PROYECTO = 500;
-const MAX_TOTAL_BYTES = 200 * 1024 * 1024;
+const MAX_ARCHIVOS_PROYECTO = Number.parseInt(
+  process.env.MAX_ARCHIVOS_PROYECTO || '2000',
+  10
+);
+const MAX_TOTAL_BYTES = Number.parseInt(
+  process.env.MAX_TOTAL_BYTES || String(2 * 1024 * 1024 * 1024),
+  10
+);
 
 const subirArchivo = async (req, res) => {
   try {

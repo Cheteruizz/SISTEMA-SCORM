@@ -16,21 +16,26 @@ const ensureUnique = (values, label) => {
   return errors;
 };
 
-const validateResource = (resource) => {
+const validateResource = (resource, { allowMissingHref = false } = {}) => {
   const errors = [];
+  const warnings = [];
   if (!resource || !resource.identificador) {
     errors.push('Recurso sin identificador');
-    return errors;
+    return { errors, warnings };
   }
   const href = normalizeRelativePath(resource.href || '');
   if (!href) {
-    errors.push(`Href invalido en recurso ${resource.identificador}`);
+    if (allowMissingHref) {
+      warnings.push(`Recurso sin href: ${resource.identificador}`);
+    } else {
+      errors.push(`Href invalido en recurso ${resource.identificador}`);
+    }
   }
   const scormType = (resource.scorm_type || '').toLowerCase();
   if (scormType && !SCORM_TYPES.has(scormType)) {
     errors.push(`scormType invalido en recurso ${resource.identificador}`);
   }
-  return errors;
+  return { errors, warnings };
 };
 
 const validateItemTree = (items, resourceIds, errors, warnings) => {
@@ -72,7 +77,9 @@ const validateManifestModel = ({ manifest, organizaciones, items, recursos, vers
   errors.push(...ensureUnique(recursos.map((res) => res.identificador), 'recurso'));
 
   recursos.forEach((recurso) => {
-    errors.push(...validateResource(recurso));
+    const result = validateResource(recurso, { allowMissingHref: true });
+    errors.push(...result.errors);
+    warnings.push(...result.warnings);
   });
 
   errors.push(...ensureUnique(items.map((item) => item.identificador), 'item'));
@@ -135,7 +142,9 @@ const validateManifestImportData = ({ manifest, organizations, resources }) => {
       errors.push(`Identificador de recurso duplicado: ${res.identificador}`);
     }
     resourceIds.add(res.identificador);
-    errors.push(...validateResource(res));
+    const result = validateResource(res, { allowMissingHref: true });
+    errors.push(...result.errors);
+    warnings.push(...result.warnings);
   });
 
   organizations.forEach((org) => {

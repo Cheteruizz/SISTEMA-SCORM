@@ -27,7 +27,17 @@ const obtenerProyecto = async (req, res) => {
 
 const crearProyecto = async (req, res) => {
   try {
-    const { id_usuario, titulo, descripcion, version_scorm, estado } = req.body;
+    const {
+      id_usuario,
+      titulo,
+      descripcion,
+      version_scorm,
+      estado,
+      tracking_preset_default,
+      tracking_auto_default,
+      tracking_min_seconds_default,
+      tracking_media_ratio_default,
+    } = req.body;
 
     if (!id_usuario || !titulo || !version_scorm || !estado) {
       return res.status(400).json({
@@ -41,6 +51,10 @@ const crearProyecto = async (req, res) => {
       descripcion: descripcion || null,
       version_scorm,
       estado,
+      tracking_preset_default,
+      tracking_auto_default,
+      tracking_min_seconds_default,
+      tracking_media_ratio_default,
     });
 
     return res.status(201).json({
@@ -56,7 +70,16 @@ const crearProyecto = async (req, res) => {
 const actualizarProyecto = async (req, res) => {
   try {
     const { id } = req.params;
-    const { titulo, descripcion, version_scorm, estado } = req.body;
+    const {
+      titulo,
+      descripcion,
+      version_scorm,
+      estado,
+      tracking_preset_default,
+      tracking_auto_default,
+      tracking_min_seconds_default,
+      tracking_media_ratio_default,
+    } = req.body;
 
     if (!titulo || !version_scorm || !estado) {
       return res.status(400).json({
@@ -64,11 +87,39 @@ const actualizarProyecto = async (req, res) => {
       });
     }
 
+    let trackingPresetValue = tracking_preset_default;
+    let trackingAutoValue = tracking_auto_default;
+    let trackingMinSecondsValue = tracking_min_seconds_default;
+    let trackingMediaRatioValue = tracking_media_ratio_default;
+
+    if (
+      trackingPresetValue === undefined ||
+      trackingAutoValue === undefined ||
+      trackingMinSecondsValue === undefined ||
+      trackingMediaRatioValue === undefined
+    ) {
+      const existing = await Proyecto.obtenerPorId(id);
+      if (existing) {
+        if (trackingPresetValue === undefined) trackingPresetValue = existing.tracking_preset_default;
+        if (trackingAutoValue === undefined) trackingAutoValue = existing.tracking_auto_default;
+        if (trackingMinSecondsValue === undefined) {
+          trackingMinSecondsValue = existing.tracking_min_seconds_default;
+        }
+        if (trackingMediaRatioValue === undefined) {
+          trackingMediaRatioValue = existing.tracking_media_ratio_default;
+        }
+      }
+    }
+
     const affected = await Proyecto.actualizar(id, {
       titulo,
       descripcion: descripcion || null,
       version_scorm,
       estado,
+      tracking_preset_default: trackingPresetValue,
+      tracking_auto_default: trackingAutoValue,
+      tracking_min_seconds_default: trackingMinSecondsValue,
+      tracking_media_ratio_default: trackingMediaRatioValue,
     });
 
     if (!affected) {

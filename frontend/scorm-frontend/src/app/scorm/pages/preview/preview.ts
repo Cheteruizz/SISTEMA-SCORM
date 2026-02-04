@@ -1,9 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ScormService } from '../../../services/scorm.service';
 import { ScormStateService } from '../../../services/scorm-state.service';
 import { ScormNavComponent } from '../../components/scorm-nav/scorm-nav';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 interface LeccionResumen {
   id: number;
@@ -22,7 +24,7 @@ interface ModuloResumen {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ScormNavComponent],
+  imports: [CommonModule, FormsModule, ScormNavComponent],
   templateUrl: './preview.html',
   styleUrls: ['./preview.scss'],
 })
@@ -30,6 +32,7 @@ export class PreviewComponent implements OnInit {
   private scorm = inject(ScormService);
   private state = inject(ScormStateService);
   private router = inject(Router);
+  private toast = inject(ToastService);
 
   proyecto: any = null;
   metadata: any = null;
@@ -38,19 +41,19 @@ export class PreviewComponent implements OnInit {
   versionLabel = '1.2';
   scormGenerado = false;
   validacion: { valido: boolean; errores: string[]; warnings: string[] } | null = null;
+  auditoria: { valido: boolean; errores: string[]; warnings: string[] } | null = null;
   validando = false;
-  runtimeTesting = false;
-  runtimeTested = false;
-  runtimeResults: Array<{ recurso: string; estado: 'ok' | 'warn' | 'fail'; detalles: string[] }> = [];
+  auditando = false;
+  zipName = '';
 
   ngOnInit() {
     const projectId = this.state.getProjectId();
     const manifestId = this.state.getManifestId();
     const orgId = this.state.getOrganizationId();
     const version = this.state.getVersion();
-    this.versionLabel = version === '2004_4th' ? '2004' : '1.2';
+    this.versionLabel = version.startsWith('2004') ? '2004' : '1.2';
     if (!projectId || !manifestId || !orgId) {
-      alert('No hay proyecto activo.');
+      this.toast.warn('No hay proyecto activo.');
       this.router.navigate(['/metadata']);
       return;
     }
@@ -121,10 +124,40 @@ export class PreviewComponent implements OnInit {
     this.router.navigate(['/resources']);
   }
 
+  guardarBorrador() {
+    const projectId = this.state.getProjectId();
+    if (!projectId) {
+      this.toast.warn('No hay proyecto activo para guardar.');
+      return;
+    }
+
+    const version = this.state.getVersion();
+    this.scorm.obtenerProyecto(projectId).subscribe({
+      next: (proyecto) => {
+        this.scorm
+          .actualizarProyecto(projectId, {
+            titulo: proyecto.titulo || 'Proyecto SCORM',
+            descripcion: proyecto.descripcion || '',
+            version_scorm: proyecto.version_scorm || version,
+            estado: 'borrador',
+          })
+          .subscribe({
+            next: () => {
+              this.toast.success('Borrador guardado.');
+              this.state.clearProjectData();
+              this.router.navigate(['/history']);
+            },
+            error: () => this.toast.error('No se pudo guardar el borrador.'),
+          });
+      },
+      error: () => this.toast.error('No se pudo guardar el borrador.'),
+    });
+  }
+
   generarScorm() {
     const projectId = this.state.getProjectId();
     if (!projectId) {
-      alert('No hay proyecto activo.');
+      this.toast.warn('No hay proyecto activo.');
       return;
     }
 
@@ -134,14 +167,33 @@ export class PreviewComponent implements OnInit {
         this.validacion = resultado;
         this.validando = false;
         if (!resultado.valido) {
-          alert('Hay errores de validacion. Revisa la lista antes de generar.');
+          this.toast.warn('Hay errores de validacion. Revisa la lista antes de generar.');
           return;
         }
         this.generarScormZip(projectId);
       },
       error: () => {
         this.validando = false;
-        alert('No se pudo validar el proyecto.');
+        this.toast.error('No se pudo validar el proyecto.');
+      },
+    });
+  }
+
+  auditarScorm() {
+    const projectId = this.state.getProjectId();
+    if (!projectId) {
+      this.toast.warn('No hay proyecto activo.');
+      return;
+    }
+    this.auditando = true;
+    this.scorm.auditarScorm(projectId).subscribe({
+      next: (resultado) => {
+        this.auditoria = resultado;
+        this.auditando = false;
+      },
+      error: () => {
+        this.auditando = false;
+        this.toast.error('No se pudo auditar el proyecto.');
       },
     });
   }
@@ -149,19 +201,19 @@ export class PreviewComponent implements OnInit {
   private generarScormZip(projectId: number) {
     const version = this.state.getVersion();
     const generar$ =
-      version === '2004_4th' ? this.scorm.generarScorm2004(projectId) : this.scorm.generarScorm(projectId);
+      version.startsWith('2004') ? this.scorm.generarScorm2004(projectId) : this.scorm.generarScorm(projectId);
 
     generar$.subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = version === '2004_4th' ? `scorm2004_${projectId}.zip` : `scorm_${projectId}.zip`;
+        link.download = this.buildZipName(projectId, version);
         link.click();
         window.URL.revokeObjectURL(url);
         this.scormGenerado = true;
       },
-      error: () => alert('Error al generar SCORM.'),
+      error: () => this.toast.error('Error al generar SCORM.'),
     });
   }
 
@@ -170,127 +222,14 @@ export class PreviewComponent implements OnInit {
     this.router.navigate(['/layout']);
   }
 
-  async ejecutarSmokeTest() {
-    if (!this.recursos.length) {
-      alert('No hay recursos disponibles para probar.');
-      return;
+  private buildZipName(projectId: number, version: string | null) {
+    const base = (this.zipName || '').trim();
+    const safe = base
+      ? base.replace(/[^a-zA-Z0-9_-]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 80)
+      : '';
+    if (safe) {
+      return safe.toLowerCase().endsWith('.zip') ? safe : `${safe}.zip`;
     }
-    const version = this.state.getVersion() || '1.2';
-    const recursosSco = this.recursos.filter((recurso) => (recurso.scorm_type || 'sco') === 'sco');
-    if (!recursosSco.length) {
-      alert('No hay SCOs para probar.');
-      return;
-    }
-
-    this.runtimeTesting = true;
-    this.runtimeTested = false;
-    this.runtimeResults = [];
-
-    for (const recurso of recursosSco) {
-      const result = await this.probarRecursoRuntime(recurso, version);
-      this.runtimeResults.push(result);
-    }
-
-    this.runtimeTesting = false;
-    this.runtimeTested = true;
-  }
-
-  private probarRecursoRuntime(recurso: any, version: string) {
-    return new Promise<{ recurso: string; estado: 'ok' | 'warn' | 'fail'; detalles: string[] }>((resolve) => {
-      const detalles: string[] = [];
-      const href = recurso.href || recurso.nombre_fisico;
-      if (!href) {
-        resolve({ recurso: recurso.identificador || 'SCO', estado: 'fail', detalles: ['Sin href de entrada'] });
-        return;
-      }
-
-      const calls: Record<string, number> = {};
-      const register = (name: string) => {
-        calls[name] = (calls[name] || 0) + 1;
-        return 'true';
-      };
-
-      const api12 = {
-        LMSInitialize: () => register('LMSInitialize'),
-        LMSSetValue: () => register('LMSSetValue'),
-        LMSGetValue: () => register('LMSGetValue'),
-        LMSCommit: () => register('LMSCommit'),
-        LMSFinish: () => register('LMSFinish'),
-        LMSGetLastError: () => '0',
-        LMSGetErrorString: () => '',
-        LMSGetDiagnostic: () => '',
-      };
-
-      const api2004 = {
-        Initialize: () => register('Initialize'),
-        SetValue: () => register('SetValue'),
-        GetValue: () => register('GetValue'),
-        Commit: () => register('Commit'),
-        Terminate: () => register('Terminate'),
-        GetLastError: () => '0',
-        GetErrorString: () => '',
-        GetDiagnostic: () => '',
-      };
-
-      (window as any).API = api12;
-      (window as any).API_1484_11 = api2004;
-
-      const iframe = document.createElement('iframe');
-      iframe.style.width = '1px';
-      iframe.style.height = '1px';
-      iframe.style.opacity = '0';
-      iframe.style.position = 'fixed';
-      iframe.style.pointerEvents = 'none';
-      iframe.style.border = '0';
-      iframe.src = `http://localhost:3000/uploads/${encodeURI(href)}`;
-      document.body.appendChild(iframe);
-
-      const timeout = setTimeout(() => {
-        if (iframe.parentElement) {
-          iframe.parentElement.removeChild(iframe);
-        }
-        (window as any).API = null;
-        (window as any).API_1484_11 = null;
-
-        const initCalled = version === '2004_4th' ? calls['Initialize'] : calls['LMSInitialize'];
-        const commitCalled = version === '2004_4th' ? calls['Commit'] : calls['LMSCommit'];
-        const termCalled = version === '2004_4th' ? calls['Terminate'] : calls['LMSFinish'];
-        const setCalled = version === '2004_4th' ? calls['SetValue'] : calls['LMSSetValue'];
-
-        if (!initCalled) {
-          detalles.push('No se detecto Initialize/LMSInitialize.');
-        }
-        if (!setCalled) {
-          detalles.push('No se detecto SetValue/LMSSetValue.');
-        }
-        if (!commitCalled) {
-          detalles.push('No se detecto Commit/LMSCommit.');
-        }
-        if (!termCalled) {
-          detalles.push('No se detecto Terminate/LMSFinish.');
-        }
-
-        const estado = detalles.length === 0 ? 'ok' : 'warn';
-        resolve({
-          recurso: recurso.identificador || recurso.href || 'SCO',
-          estado,
-          detalles: detalles.length ? detalles : ['Runtime SCORM detectado correctamente.'],
-        });
-      }, 6000);
-
-      iframe.onerror = () => {
-        clearTimeout(timeout);
-        if (iframe.parentElement) {
-          iframe.parentElement.removeChild(iframe);
-        }
-        (window as any).API = null;
-        (window as any).API_1484_11 = null;
-        resolve({
-          recurso: recurso.identificador || 'SCO',
-          estado: 'fail',
-          detalles: ['No se pudo cargar el SCO para la prueba.'],
-        });
-      };
-    });
+    return version && version.startsWith('2004') ? `scorm2004_${projectId}.zip` : `scorm_${projectId}.zip`;
   }
 }

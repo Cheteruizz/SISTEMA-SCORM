@@ -38,6 +38,7 @@ const crearMetadata = async (req, res) => {
       nivel_dificultad,
       objetivo,
       descripcion_detallada,
+      portada_ruta,
     } = req.body;
 
     if (!id_proyecto) {
@@ -56,6 +57,7 @@ const crearMetadata = async (req, res) => {
       nivel_dificultad,
       objetivo,
       descripcion_detallada,
+      portada_ruta,
     });
 
     return res.status(201).json({
@@ -80,6 +82,7 @@ const actualizarMetadata = async (req, res) => {
       nivel_dificultad,
       objetivo,
       descripcion_detallada,
+      portada_ruta,
     } = req.body;
 
     const affected = await ProyectoMetadata.actualizar(id, {
@@ -91,6 +94,7 @@ const actualizarMetadata = async (req, res) => {
       nivel_dificultad,
       objetivo,
       descripcion_detallada,
+      portada_ruta,
     });
 
     if (!affected) {

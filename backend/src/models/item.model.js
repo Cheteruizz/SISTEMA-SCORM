@@ -36,11 +36,13 @@ const Item = {
     id_modulo,
     id_leccion,
     id_recurso,
+    sequencing_xml,
+    navigation_xml,
   }) {
     const [result] = await db.query(
       `INSERT INTO item
-        (id_organizacion, id_padre, identificador, titulo, tipo_item, orden, es_lanzable, id_modulo, id_leccion, id_recurso)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (id_organizacion, id_padre, identificador, titulo, tipo_item, orden, es_lanzable, id_modulo, id_leccion, id_recurso, sequencing_xml, navigation_xml)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id_organizacion,
         id_padre || null,
@@ -52,6 +54,8 @@ const Item = {
         id_modulo || null,
         id_leccion || null,
         id_recurso || null,
+        sequencing_xml || null,
+        navigation_xml || null,
       ]
     );
     return result.insertId;
@@ -59,11 +63,23 @@ const Item = {
 
   async actualizar(
     id_item,
-    { id_padre, identificador, titulo, tipo_item, orden, es_lanzable, id_modulo, id_leccion, id_recurso }
+    {
+      id_padre,
+      identificador,
+      titulo,
+      tipo_item,
+      orden,
+      es_lanzable,
+      id_modulo,
+      id_leccion,
+      id_recurso,
+      sequencing_xml,
+      navigation_xml,
+    }
   ) {
     const [result] = await db.query(
       `UPDATE item
-       SET id_padre = ?, identificador = ?, titulo = ?, tipo_item = ?, orden = ?, es_lanzable = ?, id_modulo = ?, id_leccion = ?, id_recurso = ?
+       SET id_padre = ?, identificador = ?, titulo = ?, tipo_item = ?, orden = ?, es_lanzable = ?, id_modulo = ?, id_leccion = ?, id_recurso = ?, sequencing_xml = ?, navigation_xml = ?
        WHERE id_item = ?`,
       [
         id_padre || null,
@@ -75,6 +91,8 @@ const Item = {
         id_modulo || null,
         id_leccion || null,
         id_recurso || null,
+        sequencing_xml || null,
+        navigation_xml || null,
         id_item,
       ]
     );

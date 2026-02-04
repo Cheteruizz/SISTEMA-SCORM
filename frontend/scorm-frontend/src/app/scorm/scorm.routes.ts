@@ -58,11 +58,6 @@ export const SCORM_ROUTES: Routes = [
         canActivate: [requireProject],
       },
       {
-        path: 'importar',
-        loadComponent: () =>
-          import('./pages/import/import').then(m => m.ImportComponent),
-      },
-      {
         path: 'validation',
         loadComponent: () =>
           import('./pages/validation/validation').then(m => m.ValidationComponent),

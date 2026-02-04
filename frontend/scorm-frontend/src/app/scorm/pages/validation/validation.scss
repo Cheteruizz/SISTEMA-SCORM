@@ -27,6 +27,23 @@ p {
   margin: 0;
 }
 
+.acciones-rapidas {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--color-principal);
+  color: var(--color-principal);
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
 .scorm-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(260px, 1fr));

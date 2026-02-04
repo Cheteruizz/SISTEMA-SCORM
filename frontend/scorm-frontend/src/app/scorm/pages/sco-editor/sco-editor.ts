@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ScormService } from '../../../services/scorm.service';
 import { ScormStateService } from '../../../services/scorm-state.service';
+import { ToastService } from '../../../shared/toast/toast.service';
+import { ASSETS_BASE_URL } from '../../../config';
 
 interface ArchivoInfo {
   id_archivo: number;
@@ -34,6 +36,7 @@ export class ScoEditorComponent implements OnInit {
   private state = inject(ScormStateService);
   private fb = inject(FormBuilder);
   private sanitizer = inject(DomSanitizer);
+  private toast = inject(ToastService);
 
   archivos: ArchivoInfo[] = [];
   scos: ScoInfo[] = [];
@@ -63,7 +66,7 @@ export class ScoEditorComponent implements OnInit {
     const projectId = this.state.getProjectId();
     this.version = this.state.getVersion() || '1.2';
     if (!projectId) {
-      alert('No hay proyecto activo.');
+      this.toast.warn('No hay proyecto activo.');
       return;
     }
     this.cargarArchivos(projectId);
@@ -92,13 +95,13 @@ export class ScoEditorComponent implements OnInit {
 
   crearSco() {
     if (!this.scoForm.valid) {
-      alert('Completa los campos obligatorios del SCO.');
+      this.toast.warn('Completa los campos obligatorios del SCO.');
       return;
     }
 
     const projectId = this.state.getProjectId();
     if (!projectId) {
-      alert('No hay proyecto activo.');
+      this.toast.warn('No hay proyecto activo.');
       return;
     }
 
@@ -106,7 +109,7 @@ export class ScoEditorComponent implements OnInit {
       (archivo) => archivo.nombre_fisico === this.scoForm.value.archivo_entrada
     );
     if (!entrada) {
-      alert('Selecciona un archivo de entrada valido.');
+      this.toast.warn('Selecciona un archivo de entrada valido.');
       return;
     }
 
@@ -140,9 +143,9 @@ export class ScoEditorComponent implements OnInit {
           this.archivosSeleccionados.clear();
           this.scoForm.reset({ ancho: 960, alto: 540 });
           this.cargarScos(projectId);
-          alert('SCO creado correctamente.');
+          this.toast.success('SCO creado correctamente.');
         },
-        error: () => alert('Error al crear el SCO.'),
+        error: () => this.toast.error('Error al crear el SCO.'),
       });
   }
 
@@ -152,7 +155,7 @@ export class ScoEditorComponent implements OnInit {
       width: sco.ancho || 960,
       height: sco.alto || 540,
     };
-    const url = `http://localhost:3000/uploads/${encodeURIComponent(sco.archivo_entrada)}`;
+    const url = `${ASSETS_BASE_URL}/uploads/${encodeURIComponent(sco.archivo_entrada)}`;
     this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
     this.prepararApiRuntime(sco, url);
   }
@@ -193,7 +196,7 @@ export class ScoEditorComponent implements OnInit {
           this.cargarCmiInicial();
           this.commitTimer = setInterval(() => this.commitRuntime(), 30000);
         },
-        error: () => alert('No se pudo iniciar la sesion SCORM.'),
+        error: () => this.toast.error('No se pudo iniciar la sesion SCORM.'),
       });
   }
 
@@ -210,14 +213,19 @@ export class ScoEditorComponent implements OnInit {
 
   private cmiStore = new Map<string, any>();
 
+  private is2004Version(version?: string) {
+    const value = version || this.version || '';
+    return value.startsWith('2004');
+  }
+
   private inicializarApi(version: string) {
-    const api = version === '2004_4th' ? this.crearApi2004() : this.crearApi12();
+    const api = this.is2004Version(version) ? this.crearApi2004() : this.crearApi12();
     this.initialized = false;
     this.terminated = false;
     this.lastError = '0';
     this.apiLogs = [];
     this.commits = 0;
-    if (version === '2004_4th') {
+    if (this.is2004Version(version)) {
       (window as any).API_1484_11 = api;
       (window as any).API = null;
     } else {
@@ -451,7 +459,7 @@ export class ScoEditorComponent implements OnInit {
   private construirDatosSesionDesdeCmi() {
     const get = (key: string) => this.cmiStore.get(key);
     const sesion: any = {};
-    if (this.version === '2004_4th') {
+    if (this.is2004Version()) {
       sesion.estado_completado = get('cmi.completion_status') || null;
       sesion.estado_exito = get('cmi.success_status') || null;
       sesion.puntuacion_raw = get('cmi.score.raw') || null;
@@ -483,21 +491,21 @@ export class ScoEditorComponent implements OnInit {
 
   private validarAccesoCmi(key: string, action: 'get' | 'set') {
     if (!key || !key.startsWith('cmi.') && !key.startsWith('adl.')) {
-      return { ok: false, codigo: this.version === '2004_4th' ? '401' : '401', mensaje: 'Elemento invalido' };
+      return { ok: false, codigo: this.is2004Version() ? '401' : '401', mensaje: 'Elemento invalido' };
     }
 
     if (action === 'get' && this.isWriteOnly(key)) {
-      return { ok: false, codigo: this.version === '2004_4th' ? '405' : '404', mensaje: 'Elemento solo escritura' };
+      return { ok: false, codigo: this.is2004Version() ? '405' : '404', mensaje: 'Elemento solo escritura' };
     }
     if (action === 'set' && this.isReadOnly(key)) {
-      return { ok: false, codigo: this.version === '2004_4th' ? '404' : '403', mensaje: 'Elemento solo lectura' };
+      return { ok: false, codigo: this.is2004Version() ? '404' : '403', mensaje: 'Elemento solo lectura' };
     }
     return { ok: true, codigo: '0', mensaje: '' };
   }
 
   private validarValorCmi(key: string, value: any) {
     const texto = value === null || value === undefined ? '' : String(value);
-    const is2004 = this.version === '2004_4th';
+    const is2004 = this.is2004Version();
     const enumMap: Record<string, string[]> = is2004
       ? {
           'cmi.completion_status': ['completed', 'incomplete', 'not attempted', 'unknown'],
@@ -602,7 +610,7 @@ export class ScoEditorComponent implements OnInit {
   }
 
   private isReadOnly(key: string) {
-    if (this.version === '2004_4th') {
+    if (this.is2004Version()) {
       return [
         'cmi._version',
         'cmi.learner_id',
@@ -635,7 +643,7 @@ export class ScoEditorComponent implements OnInit {
   }
 
   private isWriteOnly(key: string) {
-    if (this.version === '2004_4th') {
+    if (this.is2004Version()) {
       return ['cmi.exit', 'cmi.session_time'].includes(key);
     }
     return ['cmi.core.exit', 'cmi.core.session_time'].includes(key);

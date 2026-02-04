@@ -17,6 +17,9 @@
         Puedes a&#241;adir lecciones dentro del m&#243;dulo seleccionado.
       </p>
     </div>
+    <div class="acciones-superior">
+      <button class="btn-secundario" type="button" (click)="guardarBorrador()">Guardar borrador y salir</button>
+    </div>
 
     <div *ngIf="vistaActual === 'creacion'" class="fade-in">
       <div class="tarjeta-formulario">
@@ -29,7 +32,12 @@
 
         <div class="campo-formulario">
           <label>Identificador &#218;nico del M&#243;dulo:</label>
-          <input type="text" [(ngModel)]="nuevoModulo.codigo" placeholder="Ej. mod_01">
+          <input type="text" [(ngModel)]="nuevoModulo.codigo" placeholder="Ej. mod_01" [disabled]="autoModuloId" (input)="validarCodigoModulo()">
+          <label class="auto-id">
+            <input type="checkbox" [(ngModel)]="autoModuloId">
+            Generar ID automaticamente
+          </label>
+          <small class="error" *ngIf="codigoModuloError">{{ codigoModuloError }}</small>
         </div>
 
         <div class="campo-formulario">
@@ -59,15 +67,32 @@
           <p>No hay m&#243;dulos creados todav&#237;a.</p>
         </div>
 
-        <div *ngFor="let mod of modulos" class="tarjeta-item">
+        <div *ngFor="let mod of modulos" class="tarjeta-item" draggable="true"
+             (dragstart)="onDragStartModulo(mod)" (dragover)="$event.preventDefault()" (drop)="onDropModulo(mod)">
           <div class="info-item">
             <span class="id-badge">{{ mod.codigo }}</span>
-            <span class="nombre-item">{{ mod.nombre }}</span>
+            <span class="nombre-item" *ngIf="editModuloId !== mod.id_modulo">{{ mod.nombre }}</span>
+            <div class="inline-edit" *ngIf="editModuloId === mod.id_modulo">
+              <input type="text" [(ngModel)]="editModulo.nombre" placeholder="Nombre del modulo">
+              <input type="text" [(ngModel)]="editModulo.codigo" placeholder="ID del modulo" (input)="validarCodigoModuloEdit(mod)">
+              <small class="error" *ngIf="codigoModuloEditError">{{ codigoModuloEditError }}</small>
+            </div>
             <span class="contador-lecciones">{{ mod.lecciones.length }} lecciones</span>
           </div>
-          <button class="btn-gestion" (click)="gestionarLecciones(mod)">
-            A&#241;adir lecciones a este m&#243;dulo
-          </button>
+          <div class="inline-actions">
+            <button class="btn-gestion" (click)="gestionarLecciones(mod)">
+              A&#241;adir lecciones
+            </button>
+            <button class="btn-gestion" *ngIf="editModuloId !== mod.id_modulo" (click)="iniciarEdicionModulo(mod)">
+              Editar
+            </button>
+            <button class="btn-gestion" *ngIf="editModuloId === mod.id_modulo" (click)="guardarEdicionModulo(mod)">
+              Guardar
+            </button>
+            <button class="btn-gestion" *ngIf="editModuloId === mod.id_modulo" (click)="cancelarEdicionModulo()">
+              Cancelar
+            </button>
+          </div>
         </div>
       </div>
 
@@ -77,39 +102,100 @@
     </div>
 
     <div *ngIf="vistaActual === 'lecciones' && moduloActual" class="fade-in">
-      <h3 class="titulo-modulo-actual">M&#243;dulo: {{ moduloActual.nombre }}</h3>
-
-      <div class="tarjeta-formulario mini">
-        <h4>A&#241;adir Lecci&#243;n</h4>
-        <div class="campo-formulario">
-          <label>ID Lecci&#243;n:</label>
-          <input type="text" [(ngModel)]="nuevaLeccion.codigo">
+      <div class="module-switch">
+        <div>
+          <label>M&#243;dulo actual:</label>
+          <select [(ngModel)]="moduloActualId" (change)="cambiarModulo(moduloActualId)">
+            <option *ngFor="let mod of modulos" [value]="mod.id_modulo">
+              {{ mod.codigo }} - {{ mod.nombre }}
+            </option>
+          </select>
         </div>
-        <div class="campo-formulario">
-          <label>Nombre de la lecci&#243;n:</label>
-          <input type="text" [(ngModel)]="nuevaLeccion.nombre">
-        </div>
-        <div class="campo-formulario">
-          <label>Tipo lecci&#243;n:</label>
-          <input type="text" [(ngModel)]="nuevaLeccion.tipo">
-        </div>
-        <button class="btn-continuar pequeno" (click)="crearLeccion()">A&#241;adir lecci&#243;n</button>
-      </div>
-
-      <div class="lista-lecciones-wrapper">
-        <h4>Lecciones actuales:</h4>
-        <div *ngIf="moduloActual.lecciones.length === 0" class="mensaje-vacio">
-          <small>Este m&#243;dulo no tiene lecciones.</small>
-        </div>
-
-        <div *ngFor="let lec of moduloActual.lecciones" class="item-leccion">
-          <span><strong>{{ lec.codigo }}</strong> - {{ lec.nombre }}</span>
-          <span class="btn-eliminar" (click)="borrarLeccion(lec)">Eliminar</span>
+        <div class="module-actions">
+          <button class="btn-secundario" (click)="cambiarVista('lista')">Ver m&#243;dulos</button>
+          <button class="btn-secundario" (click)="cambiarVista('creacion')">+ Nuevo m&#243;dulo</button>
         </div>
       </div>
 
-      <div class="acciones-paso">
-        <button class="btn-continuar" (click)="irARecursos()">Continuar recursos</button>
+      <div class="lecciones-layout">
+        <aside class="modulos-panel">
+          <h4>M&#243;dulos</h4>
+          <div class="modulo-chip"
+            *ngFor="let mod of modulos"
+            [class.active]="moduloActualId === mod.id_modulo"
+            (click)="cambiarModulo(mod.id_modulo)"
+            draggable="true"
+            (dragstart)="onDragStartModulo(mod)"
+            (dragover)="$event.preventDefault()"
+            (drop)="onDropModulo(mod)">
+            <strong>{{ mod.codigo }}</strong>
+            <span>{{ mod.nombre }}</span>
+            <small>{{ mod.lecciones.length }} lecciones</small>
+          </div>
+        </aside>
+
+        <div class="lecciones-panel">
+          <h3 class="titulo-modulo-actual">M&#243;dulo: {{ moduloActual.nombre }}</h3>
+
+        <div class="tarjeta-formulario mini">
+          <h4>A&#241;adir Lecci&#243;n</h4>
+          <div class="campo-formulario">
+            <label>ID Lecci&#243;n:</label>
+            <input type="text" [(ngModel)]="nuevaLeccion.codigo" [disabled]="autoLeccionId" (input)="validarCodigoLeccion()">
+            <label class="auto-id">
+              <input type="checkbox" [(ngModel)]="autoLeccionId">
+              Generar ID automaticamente
+            </label>
+            <small class="error" *ngIf="codigoLeccionError">{{ codigoLeccionError }}</small>
+          </div>
+            <div class="campo-formulario">
+              <label>Nombre de la lecci&#243;n:</label>
+              <input type="text" [(ngModel)]="nuevaLeccion.nombre">
+            </div>
+            <div class="campo-formulario">
+              <label>Tipo lecci&#243;n:</label>
+              <input type="text" [(ngModel)]="nuevaLeccion.tipo">
+            </div>
+            <button class="btn-continuar pequeno" (click)="crearLeccion()">A&#241;adir lecci&#243;n</button>
+          </div>
+
+          <div class="lista-lecciones-wrapper">
+            <h4>Lecciones actuales:</h4>
+            <div *ngIf="moduloActual.lecciones.length === 0" class="mensaje-vacio">
+              <small>Este m&#243;dulo no tiene lecciones.</small>
+            </div>
+
+        <div *ngFor="let lec of moduloActual.lecciones" class="item-leccion"
+             draggable="true"
+             (dragstart)="onDragStartLeccion(lec)"
+             (dragover)="$event.preventDefault()"
+             (drop)="onDropLeccion(lec)">
+          <span *ngIf="editLeccionId !== lec.id_leccion"><strong>{{ lec.codigo }}</strong> - {{ lec.nombre }}</span>
+          <div class="inline-edit" *ngIf="editLeccionId === lec.id_leccion">
+            <input type="text" [(ngModel)]="editLeccion.nombre" placeholder="Nombre de la leccion">
+            <input type="text" [(ngModel)]="editLeccion.codigo" placeholder="ID de la leccion" (input)="validarCodigoLeccionEdit(lec)">
+            <input type="text" [(ngModel)]="editLeccion.tipo" placeholder="Tipo">
+            <small class="error" *ngIf="codigoLeccionEditError">{{ codigoLeccionEditError }}</small>
+          </div>
+          <div class="inline-actions">
+            <span class="btn-eliminar" (click)="borrarLeccion(lec)">Eliminar</span>
+            <button class="btn-gestion" *ngIf="editLeccionId !== lec.id_leccion" (click)="iniciarEdicionLeccion(lec)">
+              Editar
+            </button>
+            <button class="btn-gestion" *ngIf="editLeccionId === lec.id_leccion" (click)="guardarEdicionLeccion(lec)">
+              Guardar
+            </button>
+            <button class="btn-gestion" *ngIf="editLeccionId === lec.id_leccion" (click)="cancelarEdicionLeccion()">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+
+          <div class="acciones-paso">
+            <button class="btn-continuar" (click)="irARecursos()">Continuar recursos</button>
+          </div>
+        </div>
       </div>
     </div>
     </div>

@@ -6,6 +6,9 @@
 
   <h1>Vista previa del Paquete SCORM</h1>
   <p>Revisa la informaci&#243;n antes de generar el paquete SCORM.</p>
+  <div class="acciones-superior">
+    <button class="btn-ghost" type="button" (click)="guardarBorrador()">Guardar borrador y salir</button>
+  </div>
 
   <section class="preview-section">
     <h2>Informaci&#243;n general</h2>
@@ -70,21 +73,34 @@
   </section>
 
   <section class="preview-section">
-    <h2>Prueba de runtime SCORM</h2>
+    <h2>Auditoria tecnica</h2>
     <p class="helper-text">
-      Ejecuta una prueba rÃ¡pida para detectar si los SCOs estÃ¡n llamando a la API SCORM.
+      {{ versionLabel === '2004'
+        ? 'Verifica reglas adicionales de SCORM 2004 (secuenciacion, metadatos y recursos).'
+        : 'Revisa consistencia basica del paquete SCORM 1.2 (metadatos y recursos).'
+      }}
     </p>
-    <button class="btn-outline" (click)="ejecutarSmokeTest()" [disabled]="runtimeTesting">
-      {{ runtimeTesting ? 'Ejecutando pruebas...' : 'Ejecutar smoke test' }}
+    <button class="btn-outline" (click)="auditarScorm()" [disabled]="auditando">
+      {{ auditando ? 'Auditando...' : 'Ejecutar auditoria' }}
     </button>
+  </section>
 
-    <div class="runtime-results" *ngIf="runtimeTested">
-      <div class="runtime-card" *ngFor="let result of runtimeResults" [class.ok]="result.estado === 'ok'" [class.warn]="result.estado === 'warn'" [class.fail]="result.estado === 'fail'">
-        <h4>{{ result.recurso }}</h4>
-        <ul>
-          <li *ngFor="let detalle of result.detalles">{{ detalle }}</li>
-        </ul>
-      </div>
+  <section class="preview-section" *ngIf="auditoria">
+    <h2>Resultado de auditoria</h2>
+    <p class="estado-validacion" [class.ok]="auditoria.valido" [class.bad]="!auditoria.valido">
+      {{ auditoria.valido ? 'Auditoria correcta' : 'Observaciones detectadas' }}
+    </p>
+    <div *ngIf="auditoria.errores?.length">
+      <h3>Errores</h3>
+      <ul>
+        <li *ngFor="let err of auditoria.errores">{{ err }}</li>
+      </ul>
+    </div>
+    <div *ngIf="auditoria.warnings?.length">
+      <h3>Advertencias</h3>
+      <ul>
+        <li *ngFor="let warn of auditoria.warnings">{{ warn }}</li>
+      </ul>
     </div>
   </section>
 
@@ -108,6 +124,10 @@
   </section>
 
     <div class="acciones-finales">
+    <div class="zip-name">
+      <label>Nombre del ZIP (opcional)</label>
+      <input type="text" [(ngModel)]="zipName" placeholder="mi_curso_scorm">
+    </div>
     <button class="btn-solid" (click)="generarScorm()" [disabled]="validando">
       {{ validando ? 'Validando...' : 'Generar SCORM' }}
     </button>

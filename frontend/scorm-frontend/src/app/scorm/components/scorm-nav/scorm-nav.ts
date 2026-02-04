@@ -36,7 +36,7 @@ export class ScormNavComponent {
     { label: 'Panel', path: '/layout', exact: true },
     { label: 'Crear paquete', path: '/metadata' },
     { label: 'Historial', path: '/history' },
-    { label: 'Importar', path: '/importar' },
+    { label: 'Secuenciacion', path: '/sequencing' },
   ];
 
   steps: StepLink[] = [
@@ -53,14 +53,19 @@ export class ScormNavComponent {
     return order.indexOf(key) < order.indexOf(this.activeStep);
   }
 
-  onImportClick() {
-    const current = this.router.url || '/layout';
-    this.state.setImportReturn(current);
-  }
-
   onExit() {
     this.state.clearProjectData();
-    this.state.clearImportReturn();
     this.router.navigate(['/home']);
+  }
+
+  get visibleLinks() {
+    const version = this.state.getVersion();
+    const allowSequencing = version.startsWith('2004');
+    return this.primaryLinks.filter((link) => {
+      if (link.path === '/sequencing') {
+        return allowSequencing;
+      }
+      return true;
+    });
   }
 }

@@ -74,6 +74,33 @@ p {
   margin-top: 10px;
 }
 
+.history-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-outline {
+  border: 2px solid var(--color-principal);
+  background: transparent;
+  color: var(--color-principal);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-danger {
+  border: 2px solid #ef4444;
+  background: #ef4444;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .history-sub ul {
   margin: 6px 0 0;
   padding-left: 20px;
