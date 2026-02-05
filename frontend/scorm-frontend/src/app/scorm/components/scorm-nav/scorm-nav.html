@@ -20,6 +20,8 @@
     </nav>
 
     <div class="nav-actions">
+      <button class="ghost btn-import" type="button" (click)="seleccionarZip()">Importar ZIP</button>
+      <input #zipInput type="file" accept=".zip" class="sr-only" (change)="onZipSelected($event)">
       <button class="ghost" type="button" (click)="onExit()">Salir</button>
     </div>
   </div>

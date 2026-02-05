@@ -106,9 +106,14 @@
 
   <section class="preview-section" *ngIf="validacion">
     <h2>Validacion del paquete</h2>
-    <p class="estado-validacion" [class.ok]="validacion.valido" [class.bad]="!validacion.valido">
-      {{ validacion.valido ? 'Validacion correcta' : 'Errores detectados' }}
+    <p class="estado-validacion" [class.ok]="validacionOk" [class.bad]="!validacionOk">
+      {{ validacionOk ? 'Validacion correcta' : 'Observaciones detectadas' }}
     </p>
+    <div class="validacion-resumen">
+      <span class="pill error" *ngIf="validacion.errores?.length">Errores: {{ validacion.errores.length }}</span>
+      <span class="pill warn" *ngIf="validacion.warnings?.length">Advertencias: {{ validacion.warnings.length }}</span>
+      <span class="pill ok" *ngIf="!validacion.errores?.length && !validacion.warnings?.length">Sin observaciones</span>
+    </div>
     <div *ngIf="validacion.errores?.length">
       <h3>Errores</h3>
       <ul>
@@ -128,6 +133,10 @@
       <label>Nombre del ZIP (opcional)</label>
       <input type="text" [(ngModel)]="zipName" placeholder="mi_curso_scorm">
     </div>
+    <label class="strict-toggle">
+      <input type="checkbox" [(ngModel)]="strictValidation">
+      Validacion estricta (bloquear advertencias)
+    </label>
     <button class="btn-solid" (click)="generarScorm()" [disabled]="validando">
       {{ validando ? 'Validando...' : 'Generar SCORM' }}
     </button>

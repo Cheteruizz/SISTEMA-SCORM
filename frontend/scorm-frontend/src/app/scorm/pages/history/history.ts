@@ -36,7 +36,9 @@ export class HistoryComponent implements OnInit {
 
     this.scorm.listarProyectos().subscribe({
       next: (proyectos: any[]) => {
-        const propios = (proyectos || []).filter((p) => p.id_usuario === userId);
+        const propios = (proyectos || []).filter(
+          (p) => Number(p.id_usuario) === Number(userId)
+        );
         this.proyectos = propios;
         if (!propios.length) {
           this.cargando = false;

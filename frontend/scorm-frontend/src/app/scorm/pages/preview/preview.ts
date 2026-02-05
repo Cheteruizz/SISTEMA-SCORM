@@ -45,6 +45,14 @@ export class PreviewComponent implements OnInit {
   validando = false;
   auditando = false;
   zipName = '';
+  strictValidation = false;
+
+  get validacionOk() {
+    if (!this.validacion) return true;
+    const errores = this.validacion.errores || [];
+    const warnings = this.validacion.warnings || [];
+    return errores.length === 0 && (!this.strictValidation || warnings.length === 0);
+  }
 
   ngOnInit() {
     const projectId = this.state.getProjectId();
@@ -166,8 +174,16 @@ export class PreviewComponent implements OnInit {
       next: (resultado) => {
         this.validacion = resultado;
         this.validando = false;
-        if (!resultado.valido) {
-          this.toast.warn('Hay errores de validacion. Revisa la lista antes de generar.');
+        const errores = resultado?.errores || [];
+        const warnings = resultado?.warnings || [];
+        const tieneErrores = errores.length > 0;
+        const tieneWarnings = warnings.length > 0;
+        if (tieneErrores || (this.strictValidation && tieneWarnings)) {
+          this.toast.warn(
+            this.strictValidation && tieneWarnings
+              ? 'Hay advertencias y el modo estricto esta activo.'
+              : 'Hay errores de validacion. Revisa la lista antes de generar.'
+          );
           return;
         }
         this.generarScormZip(projectId);

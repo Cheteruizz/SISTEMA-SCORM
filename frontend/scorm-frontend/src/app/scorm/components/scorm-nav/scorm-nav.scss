@@ -94,6 +94,24 @@
   cursor: pointer;
 }
 
+.nav-actions .btn-import {
+  background: var(--color-principal);
+  color: #fff;
+  border-color: var(--color-principal);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .nav-stepper {
   max-width: 1200px;
   margin: 12px auto 0;

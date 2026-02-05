@@ -22,6 +22,13 @@
         <button class="btn-ghost" (click)="historial()">Historial y borradores</button>
       </div>
 
+      <div class="panel-card">
+        <h3>Importar ZIP</h3>
+        <span>Sube un paquete SCORM y edítalo como uno nuevo.</span>
+        <button class="btn-outline" (click)="seleccionarZip()">Importar paquete</button>
+        <input #zipInput type="file" accept=".zip" class="sr-only" (change)="onZipSelected($event)">
+      </div>
+
     </div>
   </div>
 </div>

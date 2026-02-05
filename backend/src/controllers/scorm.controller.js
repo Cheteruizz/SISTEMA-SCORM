@@ -610,6 +610,49 @@ const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPat
           return api.LMSGetValue('cmi.core.lesson_status') || '';
         }
 
+        function getValue(key) {
+          if (!api) return '';
+          return is2004 ? api.GetValue(key) : api.LMSGetValue(key);
+        }
+
+        function setValue(key, value) {
+          if (!api) return;
+          if (is2004) {
+            api.SetValue(key, value);
+          } else {
+            api.LMSSetValue(key, value);
+          }
+        }
+
+        function isEmptyValue(value) {
+          return value === null || value === undefined || String(value).trim() === '';
+        }
+
+        function maybeSetScore(progress) {
+          if (!api || progress === null || progress === undefined) return;
+          var scoreRaw = is2004 ? getValue('cmi.score.raw') : getValue('cmi.core.score.raw');
+          if (!isEmptyValue(scoreRaw)) return;
+          var raw = Math.round(Math.max(0, Math.min(1, progress)) * 100);
+          if (is2004) {
+            setValue('cmi.score.raw', String(raw));
+            setValue('cmi.score.scaled', String((raw / 100).toFixed(3)));
+            if (isEmptyValue(getValue('cmi.score.max'))) {
+              setValue('cmi.score.max', '100');
+            }
+            if (isEmptyValue(getValue('cmi.score.min'))) {
+              setValue('cmi.score.min', '0');
+            }
+          } else {
+            setValue('cmi.core.score.raw', String(raw));
+            if (isEmptyValue(getValue('cmi.core.score.max'))) {
+              setValue('cmi.core.score.max', '100');
+            }
+            if (isEmptyValue(getValue('cmi.core.score.min'))) {
+              setValue('cmi.core.score.min', '0');
+            }
+          }
+        }
+
         function updateProgressFromApi() {
           if (!api) return;
           var progress = null;
@@ -663,7 +706,15 @@ const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPat
           if (!autoComplete || minSeconds < 0) return;
           var seconds = Math.floor((Date.now() - start) / 1000);
           var progress = minSeconds > 0 ? Math.min(1, seconds / minSeconds) : 0;
-          setProgress(progress);
+          var existingProgress = is2004
+            ? parseProgressValue(getValue('cmi.progress_measure'))
+            : parseProgressValue(getValue('cmi.core.lesson_location'));
+          if (existingProgress === null) {
+            setProgress(progress);
+          } else {
+            updateProgressUi(existingProgress);
+          }
+          maybeSetScore(existingProgress === null ? progress : existingProgress);
           if (seconds >= minSeconds) {
             setCompleted();
           }
@@ -673,6 +724,14 @@ const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPat
           if (!api) return;
           setSessionTime();
           maybeAutoCompleteByTime();
+          var finalProgress = is2004
+            ? parseProgressValue(getValue('cmi.progress_measure'))
+            : parseProgressValue(getValue('cmi.core.lesson_location'));
+          if (finalProgress === null) {
+            finalProgress = 1;
+            setProgress(finalProgress);
+          }
+          maybeSetScore(finalProgress);
           setCompleted();
           if (is2004) {
             api.SetValue('cmi.exit', 'normal');
@@ -700,6 +759,7 @@ const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPat
           }
           setStatus('SCORM inicializado');
           if (progressStatusEl) progressStatusEl.textContent = 'En curso';
+          maybeSetScore(parseProgressValue(is2004 ? getValue('cmi.progress_measure') : getValue('cmi.core.lesson_location')));
           updateProgressFromApi();
         } else {
           setStatus('API SCORM no encontrada');
@@ -824,12 +884,28 @@ const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPat
           mediaEl.addEventListener('timeupdate', function () {
             if (!mediaEl.duration || !isFinite(mediaEl.duration)) return;
             var progress = mediaEl.currentTime / mediaEl.duration;
-            setProgress(progress);
+            var existingProgress = is2004
+              ? parseProgressValue(getValue('cmi.progress_measure'))
+              : parseProgressValue(getValue('cmi.core.lesson_location'));
+            if (existingProgress === null) {
+              setProgress(progress);
+            } else {
+              updateProgressUi(existingProgress);
+            }
+            maybeSetScore(existingProgress === null ? progress : existingProgress);
             if (progress >= mediaRatio) {
               setCompleted();
             }
           });
           mediaEl.addEventListener('ended', function () {
+            var finalProgress = is2004
+              ? parseProgressValue(getValue('cmi.progress_measure'))
+              : parseProgressValue(getValue('cmi.core.lesson_location'));
+            if (finalProgress === null) {
+              finalProgress = 1;
+              setProgress(finalProgress);
+            }
+            maybeSetScore(finalProgress);
             setCompleted();
           });
         }
@@ -1053,7 +1129,7 @@ const validarProyecto = async (req, res) => {
       const filePath = resolveArchivoPath(recurso.ruta, uploadDir);
       if (!filePath || !ensureFileExists(filePath)) continue;
       const ext = path.extname(filePath).toLowerCase();
-      if (!['.html', '.htm', '.js'].includes(ext)) continue;
+      if (!['.html', '.htm'].includes(ext)) continue;
       const contenido = await fs.promises.readFile(filePath, 'utf8').catch(() => '');
       if (!contenido) continue;
       const has12 = /LMSInitialize\s*\(/.test(contenido);

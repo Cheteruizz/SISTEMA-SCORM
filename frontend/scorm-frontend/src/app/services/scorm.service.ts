@@ -273,4 +273,11 @@ export class ScormService {
     return this.http.delete(`${this.apiUrl}/scorm/sco/archivos/${id_sco_archivo}`);
   }
 
+  importarPaquete(zip: File, id_usuario: number): Observable<any> {
+    const form = new FormData();
+    form.append('file', zip);
+    form.append('id_usuario', String(id_usuario));
+    return this.http.post(`${this.apiUrl}/scorm/import`, form);
+  }
+
 }

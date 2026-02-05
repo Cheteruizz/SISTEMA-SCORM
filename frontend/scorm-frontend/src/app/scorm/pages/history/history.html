@@ -20,7 +20,9 @@
     <div class="history-item" *ngFor="let proyecto of proyectos">
       <div class="history-header">
         <h3>{{ proyecto.titulo }}</h3>
-        <span class="badge">{{ proyecto.estado }}</span>
+        <span class="badge" [class.importado]="proyecto.estado === 'importado'">
+          {{ proyecto.estado }}
+        </span>
       </div>
       <p>
         Version SCORM: {{ proyecto.version_scorm }} ·
