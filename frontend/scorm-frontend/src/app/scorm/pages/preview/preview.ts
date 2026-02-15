@@ -54,6 +54,17 @@ export class PreviewComponent implements OnInit {
     return errores.length === 0 && (!this.strictValidation || warnings.length === 0);
   }
 
+  get filteredWarnings() {
+    const warnings = this.validacion?.warnings || [];
+    return warnings.filter((warn) => {
+      const text = String(warn || '').toLowerCase();
+      if (text.includes('proyecto sin metadata')) return false;
+      if (text.includes('sco sin llamadas scorm')) return false;
+      if (text.includes('mezcla apis 1.2 y 2004')) return false;
+      return true;
+    });
+  }
+
   ngOnInit() {
     const projectId = this.state.getProjectId();
     const manifestId = this.state.getManifestId();

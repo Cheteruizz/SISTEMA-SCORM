@@ -38,11 +38,12 @@ const escapeHtml = (value) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
-const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPath }) => {
+const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPath, is2004 }) => {
   const safeTitle = escapeHtml(title || 'Contenido');
   const safeCourse = escapeHtml(courseTitle || '');
   const coverLiteral = coverPath ? JSON.stringify(coverPath) : 'null';
   const entryLiteral = JSON.stringify(entryPath || '');
+  const is2004Literal = is2004 ? 'true' : 'false';
   const minSeconds = Number.isFinite(tracking?.minSeconds)
     ? tracking.minSeconds
     : Number.isFinite(WRAPPER_STATIC_MIN_SECONDS)
@@ -478,6 +479,18 @@ const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPat
 
         function createProxy(api) {
           if (!api) return null;
+          if (${is2004Literal}) {
+            return {
+              Initialize: function (arg) { return api.Initialize ? api.Initialize(arg) : 'false'; },
+              GetValue: function (key) { return api.GetValue ? api.GetValue(key) : ''; },
+              SetValue: function (key, value) { return api.SetValue ? api.SetValue(key, value) : 'false'; },
+              Commit: function (arg) { return api.Commit ? api.Commit(arg) : 'false'; },
+              Terminate: function (arg) { return api.Terminate ? api.Terminate(arg) : 'false'; },
+              GetLastError: function () { return api.GetLastError ? api.GetLastError() : '0'; },
+              GetErrorString: function (code) { return api.GetErrorString ? api.GetErrorString(code) : ''; },
+              GetDiagnostic: function (code) { return api.GetDiagnostic ? api.GetDiagnostic(code) : ''; },
+            };
+          }
           return {
             LMSInitialize: function (arg) { return api.LMSInitialize ? api.LMSInitialize(arg) : 'false'; },
             LMSGetValue: function (key) { return api.LMSGetValue ? api.LMSGetValue(key) : ''; },
@@ -487,14 +500,6 @@ const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPat
             LMSGetLastError: function () { return api.LMSGetLastError ? api.LMSGetLastError() : '0'; },
             LMSGetErrorString: function (code) { return api.LMSGetErrorString ? api.LMSGetErrorString(code) : ''; },
             LMSGetDiagnostic: function (code) { return api.LMSGetDiagnostic ? api.LMSGetDiagnostic(code) : ''; },
-            Initialize: function (arg) { return api.Initialize ? api.Initialize(arg) : 'false'; },
-            GetValue: function (key) { return api.GetValue ? api.GetValue(key) : ''; },
-            SetValue: function (key, value) { return api.SetValue ? api.SetValue(key, value) : 'false'; },
-            Commit: function (arg) { return api.Commit ? api.Commit(arg) : 'false'; },
-            Terminate: function (arg) { return api.Terminate ? api.Terminate(arg) : 'false'; },
-            GetLastError: function () { return api.GetLastError ? api.GetLastError() : '0'; },
-            GetErrorString: function (code) { return api.GetErrorString ? api.GetErrorString(code) : ''; },
-            GetDiagnostic: function (code) { return api.GetDiagnostic ? api.GetDiagnostic(code) : ''; },
           };
         }
 
@@ -681,18 +686,26 @@ const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPat
         function setCompleted() {
           if (!api || completionSet) return;
           var current = String(getStatus() || '').toLowerCase();
-          if (current && current !== 'not attempted' && current !== 'unknown') {
-            completionSet = true;
-            return;
-          }
           if (is2004) {
-            api.SetValue('cmi.completion_status', 'completed');
             var success = api.GetValue('cmi.success_status');
             if (!success || success === 'unknown') {
               api.SetValue('cmi.success_status', 'passed');
             }
+            if (current && current !== 'not attempted' && current !== 'unknown') {
+              api.Commit('');
+              completionSet = true;
+              if (progressStatusEl) {
+                progressStatusEl.textContent = current;
+              }
+              return;
+            }
+            api.SetValue('cmi.completion_status', 'completed');
             api.Commit('');
           } else {
+            if (current && current !== 'not attempted' && current !== 'unknown') {
+              completionSet = true;
+              return;
+            }
             api.LMSSetValue('cmi.core.lesson_status', 'completed');
             api.LMSCommit('');
           }
@@ -749,8 +762,11 @@ const buildScoWrapperHtml = ({ title, courseTitle, entryPath, tracking, coverPat
         if (api) {
           var proxy = createProxy(api);
           if (proxy) {
-            window.API = proxy;
-            window.API_1484_11 = proxy;
+            if (${is2004Literal}) {
+              window.API_1484_11 = proxy;
+            } else {
+              window.API = proxy;
+            }
           }
           if (is2004) {
             api.Initialize('');
@@ -963,6 +979,22 @@ const buildScoWrapper = (recurso, courseInfo = {}) => {
   if ((ext === '.html' || ext === '.htm') && !WRAPPER_ALLOW_HTML) {
     return null;
   }
+  if (ext === '.html' || ext === '.htm') {
+    try {
+      const baseDir = path.resolve(__dirname, '..');
+      const uploadDir = process.env.UPLOAD_DIR || path.join(baseDir, 'uploads');
+      const originalPath = resolveArchivoPath(recurso.ruta, uploadDir);
+      if (originalPath && fs.existsSync(originalPath)) {
+        const html = fs.readFileSync(originalPath, 'utf8');
+        if (/API_1484_11|LMSInitialize\s*\(|Initialize\s*\(/.test(html)) {
+          return null;
+        }
+      }
+    } catch (err) {
+      // ignore and allow wrapper
+    }
+  }
+  const is2004 = String(courseInfo?.version || '').startsWith('2004');
   let tracking = {
     autoComplete: WRAPPER_AUTO_COMPLETE,
     minSeconds: WRAPPER_STATIC_MIN_SECONDS,
@@ -1001,6 +1033,7 @@ const buildScoWrapper = (recurso, courseInfo = {}) => {
     entryPath: relativeEntry,
     tracking,
     coverPath: coverRel,
+    is2004,
   });
   return { wrapperRel, html, originalHref };
 };
@@ -1369,6 +1402,7 @@ const generarPaquete12 = async (req, res) => {
     const courseInfo = {
       courseTitle: proyecto?.titulo || metadata?.descripcion_detallada || '',
       coverPath: metadata?.portada_ruta ? normalizeRelativePath(metadata.portada_ruta) : null,
+      version: proyecto?.version_scorm || '',
     };
 
     const wrapperFiles = [];
@@ -1588,6 +1622,7 @@ const generarPaquete2004 = async (req, res) => {
     const courseInfo = {
       courseTitle: proyecto?.titulo || metadata?.descripcion_detallada || '',
       coverPath: metadata?.portada_ruta ? normalizeRelativePath(metadata.portada_ruta) : null,
+      version: proyecto?.version_scorm || '',
     };
 
     const wrapperFiles = [];

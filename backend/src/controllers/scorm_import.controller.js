@@ -174,6 +174,26 @@ const titleFromHref = (href, fallback) => {
   return base || fallback;
 };
 
+const makeUniqueId = (raw, used) => {
+  const base = String(raw || '')
+    .trim()
+    .replace(/\s+/g, '_')
+    .replace(/[^A-Za-z0-9._-]/g, '_')
+    .slice(0, 80) || `ITEM_${Date.now()}`;
+  if (!used.has(base)) {
+    used.add(base);
+    return base;
+  }
+  let i = 2;
+  let candidate = `${base}_${i}`;
+  while (used.has(candidate)) {
+    i += 1;
+    candidate = `${base}_${i}`;
+  }
+  used.add(candidate);
+  return candidate;
+};
+
 const writeEntry = async (entry, destPath) => {
   await fs.promises.mkdir(path.dirname(destPath), { recursive: true });
   return new Promise((resolve, reject) => {
@@ -460,12 +480,14 @@ const importarPaquete = async (req, res) => {
         const orgId = orgIdMap.get(org.identificador);
         if (!orgId) continue;
         const isDefault = defaultOrg && org.identificador === defaultOrg.identificador;
+        const usedItemIds = new Set();
 
         if (!isDefault) {
           const createTree = async (nodes, parentId) => {
             let order = 1;
             for (const node of nodes) {
               const resourceId = node.identifierref ? recursosMap.get(node.identifierref) : null;
+              const safeIdent = makeUniqueId(node.identifier || `ITEM_${Date.now()}`, usedItemIds);
               const tipo = node.identifierref ? 'sco' : 'carpeta';
               const [itemResult] = await conn.query(
                 `INSERT INTO item
@@ -474,7 +496,7 @@ const importarPaquete = async (req, res) => {
                 [
                   orgId,
                   parentId || null,
-                  node.identifier || `ITEM_${Date.now()}`,
+                  safeIdent,
                   node.title || node.identifier || 'Item',
                   tipo,
                   order,
@@ -550,6 +572,7 @@ const importarPaquete = async (req, res) => {
             ]
           );
           const id_modulo = modResult.insertId;
+          const moduloIdent = makeUniqueId(moduloNode.identifier || `MOD_${id_modulo}`, usedItemIds);
           const [modItemResult] = await conn.query(
             `INSERT INTO item
               (id_organizacion, id_padre, identificador, titulo, tipo_item, orden, es_lanzable, id_modulo, id_leccion, id_recurso, sequencing_xml, navigation_xml)
@@ -557,7 +580,7 @@ const importarPaquete = async (req, res) => {
             [
               orgId,
               null,
-              moduloNode.identifier || `MOD_${id_modulo}`,
+              moduloIdent,
               moduloNode.title || moduloNode.identifier || 'Modulo',
               'modulo',
               moduleOrder,
@@ -587,6 +610,7 @@ const importarPaquete = async (req, res) => {
               ]
             );
             const id_leccion = lecResult.insertId;
+            const leccionIdent = makeUniqueId(`LEC_${id_leccion}`, usedItemIds);
             const [lecItemResult] = await conn.query(
               `INSERT INTO item
                 (id_organizacion, id_padre, identificador, titulo, tipo_item, orden, es_lanzable, id_modulo, id_leccion, id_recurso, sequencing_xml, navigation_xml)
@@ -594,7 +618,7 @@ const importarPaquete = async (req, res) => {
               [
                 orgId,
                 moduloItemId,
-                `LEC_${id_leccion}`,
+                leccionIdent,
                 moduloNode.title || 'Leccion',
                 'leccion',
                 1,
@@ -615,6 +639,10 @@ const importarPaquete = async (req, res) => {
                 warnings.push(`Recurso no encontrado para item ${scoNode.identifier || scoNode.title}`);
                 continue;
               }
+              const scoIdent = makeUniqueId(
+                scoNode.identifier || `SCO_${resourceId}`,
+                usedItemIds
+              );
               await conn.query(
                 `INSERT INTO item
                   (id_organizacion, id_padre, identificador, titulo, tipo_item, orden, es_lanzable, id_modulo, id_leccion, id_recurso, sequencing_xml, navigation_xml)
@@ -622,7 +650,7 @@ const importarPaquete = async (req, res) => {
                 [
                   orgId,
                   leccionItemId,
-                  scoNode.identifier || `SCO_${resourceId}`,
+                  scoIdent,
                   scoNode.title || scoNode.identifier || 'Contenido',
                   'sco',
                   scoOrder,
@@ -653,6 +681,10 @@ const importarPaquete = async (req, res) => {
                 ]
               );
               const id_leccion = lecResult.insertId;
+              const leccionIdent = makeUniqueId(
+                leccionNode.identifier || `LEC_${id_leccion}`,
+                usedItemIds
+              );
               const [lecItemResult] = await conn.query(
                 `INSERT INTO item
                   (id_organizacion, id_padre, identificador, titulo, tipo_item, orden, es_lanzable, id_modulo, id_leccion, id_recurso, sequencing_xml, navigation_xml)
@@ -660,7 +692,7 @@ const importarPaquete = async (req, res) => {
                 [
                   orgId,
                   moduloItemId,
-                  leccionNode.identifier || `LEC_${id_leccion}`,
+                  leccionIdent,
                   leccionNode.title || leccionNode.identifier || 'Leccion',
                   'leccion',
                   lessonOrder,
@@ -681,6 +713,10 @@ const importarPaquete = async (req, res) => {
                   warnings.push(`Recurso no encontrado para item ${scoNode.identifier || scoNode.title}`);
                   continue;
                 }
+                const scoIdent = makeUniqueId(
+                  scoNode.identifier || `SCO_${resourceId}`,
+                  usedItemIds
+                );
                 await conn.query(
                   `INSERT INTO item
                     (id_organizacion, id_padre, identificador, titulo, tipo_item, orden, es_lanzable, id_modulo, id_leccion, id_recurso, sequencing_xml, navigation_xml)
@@ -688,7 +724,7 @@ const importarPaquete = async (req, res) => {
                   [
                     orgId,
                     leccionItemId,
-                    scoNode.identifier || `SCO_${resourceId}`,
+                    scoIdent,
                     scoNode.title || scoNode.identifier || 'Contenido',
                     'sco',
                     scoOrder,

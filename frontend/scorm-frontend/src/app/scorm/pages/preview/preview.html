@@ -111,7 +111,7 @@
     </p>
     <div class="validacion-resumen">
       <span class="pill error" *ngIf="validacion.errores?.length">Errores: {{ validacion.errores.length }}</span>
-      <span class="pill warn" *ngIf="validacion.warnings?.length">Advertencias: {{ validacion.warnings.length }}</span>
+      <span class="pill warn" *ngIf="filteredWarnings.length">Advertencias: {{ filteredWarnings.length }}</span>
       <span class="pill ok" *ngIf="!validacion.errores?.length && !validacion.warnings?.length">Sin observaciones</span>
     </div>
     <div *ngIf="validacion.errores?.length">
@@ -120,10 +120,10 @@
         <li *ngFor="let err of validacion.errores">{{ err }}</li>
       </ul>
     </div>
-    <div *ngIf="validacion.warnings?.length">
+    <div *ngIf="filteredWarnings.length">
       <h3>Advertencias</h3>
       <ul>
-        <li *ngFor="let warn of validacion.warnings">{{ warn }}</li>
+        <li *ngFor="let warn of filteredWarnings">{{ warn }}</li>
       </ul>
     </div>
   </section>
